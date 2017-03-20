@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<!-- 
+  - This file is included by the struts.xml file as an example
+  - of how to break up the configuration file into multiple files.
+-->
+<struts>
+    <package name="welcome" namespace="/" extends="struts-default">
+
+        <default-action-ref name="Welcome" />
+
+        <action name="Welcome" class="io.bdj.webshop.actions.WelcomeAction">
+            <result>/WEB-INF/jsp/Welcome.jsp</result>
+        </action>
+        <action name="Login_*" method="{1}" class="io.bdj.webshop.actions.Login">
+            <result name="input">/WEB-INF/jsp/Login.jsp</result>
+            <result type="redirectAction">Welcome</result>
+        </action>
+    <!--
+        <action name="*" class="io.bdj.webshop.ExampleSupport">
+            <result>/WEB-INF/example/{1}.jsp</result>
+        </action>
+
+        <action name="Template" class="io.bdj.webshop.HelloWorld">
+            <result type="freemarker">/WEB-INF/ftl/help.ftl</result>
+        </action>
+-->
+        <!-- Add additional "example" package actions here. -->
+
+    </package>
+</struts>
