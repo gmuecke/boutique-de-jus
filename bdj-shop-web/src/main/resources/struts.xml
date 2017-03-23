@@ -17,7 +17,6 @@
                 <param name="namespace">/</param>
             </result>
         </action>
-
         <action name="help">
             <result type="freemarker">/WEB-INF/template/help.ftl</result>
         </action>

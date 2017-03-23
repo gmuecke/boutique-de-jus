@@ -9,15 +9,20 @@
 <struts>
     <package name="welcome" namespace="/" extends="struts-default">
 
+        <result-types>
+            <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
+        </result-types>
         <default-action-ref name="Welcome" />
 
         <action name="Welcome" class="io.bdj.webshop.actions.WelcomeAction">
-            <result>/WEB-INF/jsp/Welcome.jsp</result>
+            <result type="tiles">home</result>
         </action>
+
         <action name="Login_*" method="{1}" class="io.bdj.webshop.actions.Login">
             <result name="input">/WEB-INF/jsp/Login.jsp</result>
             <result type="redirectAction">Welcome</result>
         </action>
+
     <!--
         <action name="*" class="io.bdj.webshop.ExampleSupport">
             <result>/WEB-INF/example/{1}.jsp</result>

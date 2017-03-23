@@ -1,5 +1,6 @@
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <ul>
-    <li>item 1</li>
-    <li>item 2</li>
-    <li>item 3</li>
+    <li><s:text name="shop.labels.juices"/></li>
+    <li><s:text name="shop.labels.accessoires"/></li>
+    <li><s:text name="shop.labels.vouchers"/></li>
 </ul>
