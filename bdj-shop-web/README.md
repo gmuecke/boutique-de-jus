@@ -11,3 +11,8 @@ Use Cases
 The shop implements the following use cases (for keeping track during development)
 
 - Welcome Page
+- Login using an property-file based authentication
+  - see login.conf for JAAS LoginModule configuration
+  - see users.property for user-repository data
+  - see jetty.xml for web server security configuration
+  - see web.xml for webb app security configuration

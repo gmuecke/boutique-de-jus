@@ -5,8 +5,8 @@
     <head>
         <meta charset="UTF-8">
         <title><s:text name="Welcome.page.title"/></title>
-        <link rel="stylesheet" href="style/bdj.css">
-        <link rel="stylesheet" href="style/compat.css">
+        <link rel="stylesheet" href="/style/bdj.css">
+        <link rel="stylesheet" href="/style/compat.css">
     </head>
     <body>
         <div class="flex-container">

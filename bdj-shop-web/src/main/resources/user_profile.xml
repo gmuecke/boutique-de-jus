@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+    <package name="user" namespace="/secure" extends="struts-default">
+
+        <result-types>
+            <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
+        </result-types>
+        <interceptors>
+            <interceptor name="authentication"
+                         class="io.bdj.webshop.interceptor.RunAsInterceptor"></interceptor>
+        </interceptors>
+        <default-action-ref name="UserProfile"/>
+        <global-results>
+            <result name="login" type="redirect">/j_security_check.jsp</result>
+        </global-results>
+
+        <action name="UserProfile" class="io.bdj.webshop.actions.UserProfileAction">
+             <interceptor-ref name="authentication"/>
+            <result type="tiles">userProfile</result>
+        </action>
+
+        <action name="UserProfileNoAuth" class="io.bdj.webshop.actions.UserProfileAction">
+            <result type="tiles">userProfile</result>
+        </action>
+
+    </package>
+</struts>

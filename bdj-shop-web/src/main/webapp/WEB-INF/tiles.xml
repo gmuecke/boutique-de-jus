@@ -17,4 +17,18 @@
         <put-attribute name="body"   value="/WEB-INF/tiles/home.jsp"/>
     </definition>
 
+    <definition name="login" extends="baseLayout">
+        <put-attribute name="title"  value="Login"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/login.jsp"/>
+    </definition>
+
+    <definition name="loginError" extends="baseLayout">
+        <put-attribute name="title"  value="Login"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/loginError.jsp"/>
+    </definition>
+
+    <definition name="userProfile" extends="baseLayout" role="users">
+        <put-attribute name="title"  value="UserProfile"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/userprofile.jsp"/>
+    </definition>
 </tiles-definitions>

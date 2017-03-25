@@ -67,7 +67,7 @@ nav.side {
     top:50px;
     left: 0;
     width: 150px;
-    height: 80%;
+    height: 100%;
     background: lightsteelblue;
     z-index: 255;
 }
@@ -98,6 +98,7 @@ main {
 
 footer {
     background: lightsteelblue;
+    margin-left: 150px;
     color: black;
 }
 

@@ -1,3 +1,3 @@
 <h1>Help</h1>
 
-<p>Freemarker template</p>
+<p>This is the Boutique-de-jus help page</p>

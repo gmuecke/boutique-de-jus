@@ -21,40 +21,88 @@
 
 package io.bdj.webshop.actions;
 
-import com.opensymphony.xwork2.ActionSupport;
+import static java.util.function.Function.identity;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import com.opensymphony.xwork2.Action;
+import com.opensymphony.xwork2.ActionSupport;
+import io.bdj.webshop.auth.AuthSupport;
+import io.bdj.webshop.auth.JettySupport;
+import io.bdj.webshop.auth.LoginModuleAuthSupport;
+import org.apache.struts2.ServletActionContext;
+import org.slf4j.Logger;
+
+/**
+ * This login action performs a login using the configured LoginModules to obtain a user Subject
+ * in the current session.
+ */
 public class Login extends ActionSupport {
+
+    private static final Logger LOG = getLogger(Login.class);
+
+    private String username;
+    private String password;
+
+    private AuthSupport jettySupport = new JettySupport();
 
     public String execute() throws Exception {
 
-        if (isInvalid(getUsername())) return INPUT;
+        if (isInvalid(getUsername())) {
+            return INPUT;
+        }
+        if (isInvalid(getPassword())) {
+            return INPUT;
+        }
 
-        if (isInvalid(getPassword())) return INPUT;
+        final HttpServletRequest request = ServletActionContext.getRequest();
+        final HttpSession session = request.getSession();
 
-        return SUCCESS;
+        //perform container login
+        request.login(username, password);
+
+        //try to obtain the Subject from the container or perform an _additional_ login
+        //in order to get the subject.
+        final Optional<Subject> subject = Stream.of(jettySupport,
+                                                    new LoginModuleAuthSupport(getUsername(), getPassword()))
+                                                .map(f -> f.apply(session))
+                                                .findFirst()
+                                                .flatMap(identity());
+
+        //register the subject in the session so we can obtain it without vendor specific
+        //access logic (such as Jetty's)
+        //see RunAsInterceptor where we need this
+        subject.ifPresent(subj -> session.setAttribute("SUBJECT", subj));
+        return subject.map(s -> Action.SUCCESS).orElse(Action.ERROR);
     }
 
     private boolean isInvalid(String value) {
+
         return (value == null || value.length() == 0);
     }
 
-    private String username;
-
     public String getUsername() {
+
         return username;
     }
 
     public void setUsername(String username) {
+
         this.username = username;
     }
 
-    private String password;
-
     public String getPassword() {
+
         return password;
     }
 
     public void setPassword(String password) {
+
         this.password = password;
     }
 

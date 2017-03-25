@@ -7,16 +7,32 @@
     <constant name="struts.devMode" value="true"/>
 
     <include file="welcome_page.xml"/>
+    <include file="user_profile.xml"/>
 
     <package name="default" namespace="/" extends="struts-default">
+        <result-types>
+            <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
+        </result-types>
         <default-action-ref name="index"/>
-
+        <global-results>
+            <result name="login" type="redirect">/Login_input.action</result>
+        </global-results>
         <action name="index">
             <result type="redirectAction">
                 <param name="actionName">Welcome</param>
                 <param name="namespace">/</param>
             </result>
         </action>
+
+        <action name="Login_*" method="{1}" class="io.bdj.webshop.actions.Login">
+            <result name="input" type="tiles">login</result>
+            <result name="error" type="tiles">loginError</result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">UserProfile</param>
+                <param name="namespace">/secure</param>
+            </result>
+        </action>
+
         <action name="help">
             <result type="freemarker">/WEB-INF/template/help.ftl</result>
         </action>

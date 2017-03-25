@@ -1,5 +1,6 @@
 package io.bdj.web;
 
+import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -37,6 +38,11 @@ public class BoutiqueDeJusWebServer {
                            "org.eclipse.jetty.plus.webapp.PlusConfiguration");
         classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
                             "org.eclipse.jetty.annotations.AnnotationConfiguration");
+
+        HashLoginService loginService = new HashLoginService("BoutiqueDeJusRealm");
+        loginService.setConfig("jcgrealm.txt");
+        server.addBean(loginService);
+
 
         server.start();
         server.join();

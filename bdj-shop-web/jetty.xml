@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<!-- =============================================================== -->
+<!-- Configure the Jetty Server                                      -->
+<!--                                                                 -->
+<!-- Documentation of this file format can be found at:              -->
+<!-- http://wiki.eclipse.org/Jetty/Reference/jetty.xml_syntax        -->
+<!--                                                                 -->
+<!-- Additional configuration files are available in $JETTY_HOME/etc -->
+<!-- and can be mixed in.  For example:                              -->
+<!--   java -jar start.jar etc/jetty-ssl.xml                         -->
+<!--                                                                 -->
+<!-- See start.ini file for the default configuraton files           -->
+<!-- =============================================================== -->
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+    <!-- =========================================================== -->
+    <!-- Server Thread Pool                                          -->
+    <!-- =========================================================== -->
+    <Get name="ThreadPool">
+        <Set name="minThreads" type="int">10</Set>
+        <Set name="maxThreads" type="int">200</Set>
+        <Set name="idleTimeout" type="int">60000</Set>
+        <Set name="detailedDump">false</Set>
+    </Get>
+
+    <!-- =========================================================== -->
+    <!-- Set connectors                                              -->
+    <!-- =========================================================== -->
+
+    <Call name="addConnector">
+        <Arg>
+            <New id="httpConnector" class="org.eclipse.jetty.server.ServerConnector">
+                <Arg name="server"><Ref refid="Server" /></Arg>
+                <Arg name="acceptors" type="int"><Property name="jetty.http.acceptors" default="-1"/></Arg>
+                <Arg name="selectors" type="int"><Property name="jetty.http.selectors" default="-1"/></Arg>
+                <Set name="host"><Property name="jetty.http.host" /></Set>
+                <Set name="port"><Property name="jetty.http.port" default="8080" /></Set>
+                <Set name="idleTimeout"><Property name="jetty.http.idleTimeout" default="30000"/></Set>
+                <Set name="soLingerTime"><Property name="jetty.http.soLingerTime" default="-1"/></Set>
+                <Set name="acceptorPriorityDelta"><Property name="jetty.http.acceptorPriorityDelta" default="0"/></Set>
+                <Set name="acceptQueueSize"><Property name="jetty.http.acceptQueueSize" default="0"/></Set>
+            </New>
+        </Arg>
+    </Call>
+
+    <!-- =========================================================== -->
+    <!-- Login Configuration                                         -->
+    <!-- =========================================================== -->
+    <Call name="addBean">
+        <Arg>
+            <New class="org.eclipse.jetty.jaas.JAASLoginService">
+                <Set name="Name">BoutiqueDeJusRealm</Set>
+                <Set name="LoginModuleName">PropertyFile</Set>
+            </New>
+        </Arg>
+    </Call>
+
+    <!-- =========================================================== -->
+    <!-- Set handler Collection Structure                            -->
+    <!-- =========================================================== -->
+    <Set name="handler">
+        <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+            <Set name="handlers">
+                <Array type="org.eclipse.jetty.server.Handler">
+                    <Item>
+                        <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+                    </Item>
+                    <Item>
+                        <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+                    </Item>
+                </Array>
+            </Set>
+        </New>
+    </Set>
+
+    <!-- =========================================================== -->
+    <!-- extra options                                               -->
+    <!-- =========================================================== -->
+    <Set name="stopAtShutdown">true</Set>
+    <Call class="java.lang.System" name="setProperty">
+        <Arg>java.security.auth.login.config</Arg>
+        <Arg><Property name="jetty.base" default="." />/<Property name="jetty.jaas.login.conf" default="login.conf"/></Arg>
+    </Call>
+</Configure>

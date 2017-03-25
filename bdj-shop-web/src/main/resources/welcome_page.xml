@@ -18,21 +18,13 @@
             <result type="tiles">home</result>
         </action>
 
-        <action name="Login_*" method="{1}" class="io.bdj.webshop.actions.Login">
-            <result name="input">/WEB-INF/jsp/Login.jsp</result>
-            <result type="redirectAction">Welcome</result>
-        </action>
+
 
     <!--
         <action name="*" class="io.bdj.webshop.ExampleSupport">
             <result>/WEB-INF/example/{1}.jsp</result>
         </action>
-
-        <action name="Template" class="io.bdj.webshop.HelloWorld">
-            <result type="freemarker">/WEB-INF/ftl/help.ftl</result>
-        </action>
 -->
-        <!-- Add additional "example" package actions here. -->
 
     </package>
 </struts>
