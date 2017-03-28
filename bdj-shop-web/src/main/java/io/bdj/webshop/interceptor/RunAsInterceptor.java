@@ -41,8 +41,8 @@ public class RunAsInterceptor extends AbstractInterceptor {
         HttpSession session = ServletActionContext.getRequest().getSession();
         return Stream.of(defaultSupport, jettySupport)
                      .map(support -> support.apply(session))
-                     .filter(Optional::isPresent)
                      .findFirst()
+                     .filter(Optional::isPresent)
                      .map(Optional::get)
                      .map(runPrivileged(invocation::invoke))
                      .orElse(Action.LOGIN);

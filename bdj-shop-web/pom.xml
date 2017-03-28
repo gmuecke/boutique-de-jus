@@ -15,6 +15,7 @@
         <jetty.version>9.4.2.v20170220</jetty.version>
         <struts2.version>2.5.10.1</struts2.version>
         <log4j2.version>2.7</log4j2.version>
+        <derby.version>10.13.1.1</derby.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -54,6 +55,13 @@
             <version>${log4j2.version}</version>
         </dependency>
 
+        <!-- JDBC Driver -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>${derby.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -74,6 +82,7 @@
             <version>2.0</version>
             <scope>provided</scope>
         </dependency>
+
     </dependencies>
 
     <build>

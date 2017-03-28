@@ -12,6 +12,8 @@
         <module>bootstrap</module>
         <module>perftest-gatling</module>
         <module>bdj-shop-web</module>
+        <module>bdj-user-db</module>
+        <module>bdj-utils</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 
