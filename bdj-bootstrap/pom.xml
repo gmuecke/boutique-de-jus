@@ -9,14 +9,31 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bootstrap</artifactId>
+    <artifactId>bdj-bootstrap</artifactId>
 
     <dependencies>
+        <!-- shop modules -->
+        <dependency>
+            <groupId>io.bdj</groupId>
+            <artifactId>bdj-user-db</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bdj</groupId>
+            <artifactId>bdj-web-server</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bdj</groupId>
+            <artifactId>bdj-shop-web</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>io.bdj</groupId>
             <artifactId>bdj-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- Control UI-->
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>

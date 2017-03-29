@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>web-server</artifactId>
+    <artifactId>bdj-web-server</artifactId>
 
     <properties>
         <jetty.version>9.4.2.v20170220</jetty.version>
