@@ -1,4 +1,4 @@
-package io.bdj.util;
+package io.bdj.util.signals;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -20,10 +20,11 @@ public class SignalsTest {
 
             CountDownLatch latch = new CountDownLatch(2);
             final SocketAddress dst = new InetSocketAddress(InetAddress.getLocalHost(), 29999);
-            comm.onReceive(Signal.OK,(e) -> {
+            comm.onReceive(Signal.OK, (e) -> {
                 System.out.println("Received " + e);
                 latch.countDown();
             });
+            comm.startReceiving();
             System.out.println("sending event: OK");
             comm.send(Signal.OK, dst);
             System.out.println("sending event: OK");

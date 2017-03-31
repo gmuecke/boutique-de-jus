@@ -1,4 +1,4 @@
-package io.bdj.util;
+package io.bdj.util.signals;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -41,7 +41,6 @@ public class Event {
 
         Objects.requireNonNull(signal, "Signal must not be null");
         Objects.requireNonNull(payload, "Payload must not be null");
-        Objects.requireNonNull(source, "Source must not be null");
         if (payload.length > MAX_PAYLOAD) {
             throw new IllegalArgumentException("Payload limit exceeded: " + payload.length);
         }

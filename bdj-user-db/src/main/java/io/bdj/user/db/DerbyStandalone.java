@@ -7,8 +7,8 @@ import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import io.bdj.util.Signal;
-import io.bdj.util.SignalReceiver;
+import io.bdj.util.signals.Signal;
+import io.bdj.util.signals.SignalTransceiver;
 import org.apache.derby.drda.NetworkServerControl;
 
 /**
@@ -27,10 +27,10 @@ public class DerbyStandalone {
         server.setMaxThreads(10);
 
         final int stopPort = Integer.parseInt(System.getProperty("bdj.db.stopPort", "11009"));
-        try (SignalReceiver rcv = SignalReceiver.newReceiver(stopPort)) {
+        try (SignalTransceiver com = SignalTransceiver.create(stopPort).startReceiving()) {
             final AtomicBoolean running = new AtomicBoolean(true);
-            rcv.onReceive(Signal.SHUTDOWN, (s, a) -> {
-                LOG.info("Received stop signal from " + a);
+            com.onReceive(Signal.SHUTDOWN, e -> {
+                LOG.info("Received stop signal from " + e.getReplyAddr());
                 running.set(false);
             });
             while (running.get()) {
@@ -38,25 +38,5 @@ public class DerbyStandalone {
             }
         }
 
-        //Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-        /*
-        try (Connection connect = DriverManager.getConnection("jdbc:derby://localhost:1527/testdb;create=true");
-             Statement statement = connect.createStatement()) {
-
-            //statement.executeUpdate("CREATE TABLE USERS (NAME VARCHAR(255), NUMBER INTEGER )");
-            statement.executeUpdate("INSERT INTO USERS VALUES ('TIM', 1)");
-            statement.executeUpdate("INSERT INTO USERS VALUES ('TOM', 2)");
-            statement.executeUpdate("INSERT INTO USERS VALUES ('TONY', 3)");
-            statement.executeUpdate("INSERT INTO USERS VALUES ('TINO', 4)");
-
-            ResultSet resultSet = connect.prepareStatement("SELECT * from USERS").executeQuery();
-            while (resultSet.next()) {
-                String user = resultSet.getString("name");
-                String number = resultSet.getString("number");
-                System.out.println("User: " + user);
-                System.out.println("ID: " + number);
-            }
-        }
-        */
     }
 }

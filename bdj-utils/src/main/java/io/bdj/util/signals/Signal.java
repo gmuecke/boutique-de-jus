@@ -1,4 +1,4 @@
-package io.bdj.util;
+package io.bdj.util.signals;
 
 import static java.util.logging.Logger.getLogger;
 
