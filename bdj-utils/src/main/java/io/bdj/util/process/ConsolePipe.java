@@ -45,7 +45,7 @@ public class ConsolePipe implements AutoCloseable {
 
     }
 
-    public ConsolePipe consume() {
+    public ConsolePipe open() {
 
         if (this.pool.isShutdown()) {
             throw new IllegalStateException("ConsolePipe already closed");

@@ -1,19 +1,14 @@
 package io.bdj;
 
 import static java.util.logging.Logger.getLogger;
-import static java.util.stream.Collectors.toList;
 
-import java.net.InetAddress;
-import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import io.bdj.control.ProcessController;
 import io.bdj.util.process.ConsolePipe;
+import io.bdj.util.process.ProcessManager;
 import io.bdj.util.signals.SignalTransceiver;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -33,11 +28,9 @@ public class BoutiqueDeJusBootstrap extends Application {
     private static final Logger LOG = getLogger(BoutiqueDeJusBootstrap.class.getName());
 
     private SignalTransceiver com;
-    private ExecutorService processPool;
-    private InetAddress localhost;
     private ConsolePipe consolePipe;
     private ScheduledExecutorService scheduler;
-    private Deque<Process> processQueue;
+    private ProcessManager processManager;
 
     public static void main(String... args) throws Exception {
 
@@ -47,30 +40,18 @@ public class BoutiqueDeJusBootstrap extends Application {
     @Override
     public void init() {
 
-        this.com = SignalTransceiver.create(10111);
-        this.com.startReceiving();
-        this.processQueue = new ConcurrentLinkedDeque<>();
         this.scheduler = Executors.newScheduledThreadPool(2);
-
-        //purge terminated processes
-        this.scheduler.scheduleAtFixedRate(() -> processQueue.stream()
-                                                             .filter(p -> !p.isAlive())
-                                                             .collect(toList())
-                                                             .forEach(process -> processQueue.remove(process)),
-                                           1,
-                                           5,
-                                           TimeUnit.SECONDS);
-
-        this.localhost = InetAddress.getLoopbackAddress();
-        this.consolePipe = new ConsolePipe().consume();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(()->{
-            this.processQueue.forEach(Process::destroy);
-        }));
+        this.com = SignalTransceiver.create(10111);
+        this.consolePipe = new ConsolePipe();
+        this.processManager = new ProcessManager(this.scheduler);
     }
 
     @Override
     public void start(final Stage stage) throws Exception {
+
+        this.com.start();
+        this.consolePipe.open();
+        this.processManager.start();
 
         stage.setTitle("Boutique-de-jus Bootstrap Control");
         stage.initStyle(StageStyle.DECORATED);
@@ -80,7 +61,10 @@ public class BoutiqueDeJusBootstrap extends Application {
             try {
                 Object controller = c.newInstance();
                 if (ProcessController.class.isAssignableFrom(c)) {
-                    ((ProcessController) controller).init(this.com, this.consolePipe, this.scheduler, this.processQueue);
+                    ((ProcessController) controller).setup(this.com,
+                                                           this.consolePipe,
+                                                           this.scheduler,
+                                                           this.processManager);
                 }
                 return controller;
             } catch (InstantiationException | IllegalAccessException e) {
@@ -106,12 +90,11 @@ public class BoutiqueDeJusBootstrap extends Application {
     @Override
     public void stop() throws Exception {
 
+        this.com.close();
+
         super.stop();
         try (SignalTransceiver c = this.com;
              ConsolePipe pipe = this.consolePipe) {
         }
-
-        this.processPool.shutdown();
-
     }
 }

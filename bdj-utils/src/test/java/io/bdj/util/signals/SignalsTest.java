@@ -24,7 +24,7 @@ public class SignalsTest {
                 System.out.println("Received " + e);
                 latch.countDown();
             });
-            comm.startReceiving();
+            comm.start();
             System.out.println("sending event: OK");
             comm.send(Signal.OK, dst);
             System.out.println("sending event: OK");
