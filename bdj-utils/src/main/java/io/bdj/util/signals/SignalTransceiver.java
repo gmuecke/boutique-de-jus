@@ -47,6 +47,7 @@ public class SignalTransceiver implements AutoCloseable {
         try {
             this.sendChannel = DatagramChannel.open();
             this.receiverChannel = DatagramChannel.open();
+            //TODO support blocking/non-block (non-blocking-scheduled?)
             this.receiverChannel.configureBlocking(true);
             this.receiverChannel.bind(new InetSocketAddress(thisAddr, listenPort));
         } catch (IOException e) {

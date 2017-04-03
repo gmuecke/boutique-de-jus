@@ -17,6 +17,6 @@ public class WebServerController extends ProcessController {
     @Override
     protected String getCommandLine(final String classpath) {
 
-        return "java -cp \"" + classpath + "\" io.bdj.web.BoutiqueDeJusWebServer ./target/wars/bdj-shop-web.war";
+        return "java -cp \"" + classpath + "\" io.bdj.web.BoutiqueDeJusWebServer -w ./target/wars/bdj-shop-web.war -jettyConfig ./jetty.xml";
     }
 }
