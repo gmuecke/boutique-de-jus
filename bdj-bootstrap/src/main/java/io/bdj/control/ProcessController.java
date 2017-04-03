@@ -1,5 +1,7 @@
 package io.bdj.control;
 
+import static io.bdj.util.signals.Signal.STATUS_OK;
+
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.net.URL;
@@ -25,6 +27,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -42,9 +45,13 @@ public abstract class ProcessController implements Initializable {
     @FXML
     public Button stopButton;
     @FXML
+    public Button restartButton;
+    @FXML
     public Circle processStatus;
     @FXML
     public TextFlow consoleArea;
+    @FXML
+    public ScrollPane scrollPane;
 
     //property to track if the started process is running
     private BooleanProperty processRunning = new SimpleBooleanProperty(false);
@@ -84,6 +91,7 @@ public abstract class ProcessController implements Initializable {
 
         startButton.disableProperty().bind(processRunning);
         stopButton.disableProperty().bind(processRunning.not());
+        restartButton.disableProperty().bind(processRunning.not());
         processRunning.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 processStatus.setFill(Color.GREEN);
@@ -95,8 +103,10 @@ public abstract class ProcessController implements Initializable {
             final ObservableList<Node> textElements = consoleArea.getChildren();
             while (textElements.size() > consoleTextElements) {
                 textElements.remove(0, textElements.size() - consoleTextElements);
-            }
+        }
         });
+        scrollPane.vvalueProperty().bind(consoleArea.heightProperty());
+
     }
 
 
@@ -125,6 +135,11 @@ public abstract class ProcessController implements Initializable {
 
         //register the process end handler to receive notification when process dies
         pm.addProcessEndListener(process, p -> processRunning.set(false));
+        pm.observe(process, getServiceAddress(), sig -> {
+            if(sig == STATUS_OK){
+                updateProcessStatus(ProcessStatus.OK);
+            }
+        });
 
         //notify UI by updating the propery
         processRunning.set(process.isAlive());
@@ -207,5 +222,27 @@ public abstract class ProcessController implements Initializable {
     public void setConsoleTextElements(final int consoleTextElements) {
 
         this.consoleTextElements = consoleTextElements;
+    }
+
+    public void updateProcessStatus(ProcessStatus newStatus){
+        Platform.runLater(() -> this.processStatus.setFill(newStatus.getColor()));
+    }
+
+    public enum ProcessStatus {
+        OK(Color.GREEN),
+        STOPPED(Color.RED),
+        RESTARTING(Color.YELLOW)
+        ;
+
+        private final Color color;
+
+        ProcessStatus(final Color color) {
+            this.color = color;
+        }
+
+        Color getColor() {
+
+            return color;
+        }
     }
 }

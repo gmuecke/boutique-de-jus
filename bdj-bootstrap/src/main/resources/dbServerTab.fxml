@@ -27,6 +27,7 @@
          <children>
             <Button mnemonicParsing="false" onAction="#startServer" text="Start DB Server" fx:id="startButton" />
             <Button mnemonicParsing="false" onAction="#stopServer" text="Stop DB Server" GridPane.rowIndex="1" fx:id="stopButton" disable="true" />
+            <Button mnemonicParsing="false" onAction="#stopServer" text="Stop DB Server" GridPane.rowIndex="1" fx:id="restartButton" disable="true" visible="false"/>
             <Circle fx:id="processStatus" fill="RED" radius="10.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1" />
          </children>
       </GridPane>

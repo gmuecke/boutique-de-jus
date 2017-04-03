@@ -37,6 +37,8 @@ public class Event {
     private final InetAddress source;
     private final int callbackPort;
 
+    //TODO check if it makes sense to keep a reference to transceiver for convenient reply (i.e. event.reply(Signal))
+
     private Event(final Signal signal, final byte[] payload, final InetAddress source, final int callbackPort) {
 
         Objects.requireNonNull(signal, "Signal must not be null");

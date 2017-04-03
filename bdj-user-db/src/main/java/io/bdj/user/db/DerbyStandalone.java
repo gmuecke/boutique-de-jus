@@ -26,7 +26,7 @@ public class DerbyStandalone {
         server.setTimeSlice(5);
         server.setMaxThreads(10);
 
-        final int stopPort = Integer.parseInt(System.getProperty("bdj.db.stopPort", "11009"));
+        final int stopPort = Integer.parseInt(System.getProperty("bdj.db.signalPort", "11009"));
         try (SignalTransceiver com = SignalTransceiver.create(stopPort).start()) {
             final AtomicBoolean running = new AtomicBoolean(true);
             com.onReceive(Signal.SHUTDOWN, e -> {

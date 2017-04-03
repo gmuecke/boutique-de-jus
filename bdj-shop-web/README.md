@@ -16,3 +16,4 @@ The shop implements the following use cases (for keeping track during developmen
   - see users.property for user-repository data
   - see jetty.xml for web server security configuration
   - see web.xml for webb app security configuration
+- Registration for new users 

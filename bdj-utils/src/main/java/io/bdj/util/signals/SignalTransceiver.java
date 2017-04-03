@@ -134,7 +134,6 @@ public class SignalTransceiver implements AutoCloseable {
     }
 
     public void onReceive(Signal signal, Consumer<Event> consumer) {
-
         this.consumers.get(signal).add(consumer);
     }
 

@@ -17,8 +17,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
-import org.controlsfx.control.Notifications;
 
 /**
  *
@@ -43,7 +41,7 @@ public class BoutiqueDeJusBootstrap extends Application {
         this.scheduler = Executors.newScheduledThreadPool(2);
         this.com = SignalTransceiver.create(10111);
         this.consolePipe = new ConsolePipe();
-        this.processManager = new ProcessManager(this.scheduler);
+        this.processManager = new ProcessManager(this.scheduler, this.com);
     }
 
     @Override
@@ -79,22 +77,24 @@ public class BoutiqueDeJusBootstrap extends Application {
         stage.setScene(scene);
         stage.show();
 
-        Thread.sleep(1000);
+        /*
         Notifications.create()
                      .title("Achievement unlocked")
                      .text("Bring up a Desktop Notification!")
                      .hideAfter(Duration.seconds(2))
                      .showWarning();
+                     */
     }
 
     @Override
     public void stop() throws Exception {
 
-        this.com.close();
-
         super.stop();
-        try (SignalTransceiver c = this.com;
-             ConsolePipe pipe = this.consolePipe) {
+
+        try (SignalTransceiver com = this.com;
+             ConsolePipe pipe = this.consolePipe;
+             ProcessManager pm = this.processManager) {
         }
+        LOG.info("Bootstrap Closed");
     }
 }

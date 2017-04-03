@@ -4,17 +4,21 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import io.bdj.util.signals.Signal;
+import io.bdj.util.signals.SignalTransceiver;
 
 /**
  *
@@ -24,22 +28,21 @@ public class ProcessManager implements AutoCloseable {
     private final ScheduledExecutorService scheduler;
     private final Deque<Process> processQueue;
     private final Map<Process, List<Consumer<Process>>> processEndListeners;
+    private final Map<Process, List<ScheduledFuture>> observers;
+    private final Map<SocketAddress, Consumer<Signal>> monitorEventHandlers;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final Thread shutdownHook;
+    private final SignalTransceiver com;
 
-
-    public ProcessManager() {
-
-        this(Executors.newScheduledThreadPool(1));
-
-    }
-
-    public ProcessManager(final ScheduledExecutorService scheduler) {
+    public ProcessManager(final ScheduledExecutorService scheduler, SignalTransceiver com) {
 
         this.scheduler = scheduler;
+        this.com = com;
         this.processEndListeners = new ConcurrentHashMap<>();
         this.processQueue = new ConcurrentLinkedDeque<>();
         this.shutdownHook = new Thread(this::destroyProcesses);
+        this.observers = new ConcurrentHashMap<>();
+        this.monitorEventHandlers = new ConcurrentHashMap<>();
 
     }
 
@@ -60,20 +63,30 @@ public class ProcessManager implements AutoCloseable {
         return this;
     }
 
-    @Override
-    public void close() throws Exception {
-        this.scheduler.shutdown();
-        destroyProcesses();
-        Runtime.getRuntime().removeShutdownHook(shutdownHook);
-    }
-
     private void handleTerminatedProcess(final Process process) {
 
         this.processQueue.remove(process);
         if (this.processEndListeners.containsKey(process)) {
             this.processEndListeners.get(process).forEach(c -> c.accept(process));
-            this.processEndListeners.remove(process);
         }
+        this.processEndListeners.remove(process);
+        if(this.observers.containsKey(process)){
+            this.observers.get(process).forEach(c -> c.cancel(true));
+        }
+        this.observers.remove(process);
+    }
+
+    @Override
+    public void close() throws Exception {
+
+        this.scheduler.shutdown();
+        destroyProcesses();
+        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    }
+
+    private void destroyProcesses() {
+
+        this.processQueue.forEach(Process::destroy);
     }
 
     public Process startProcess(final String commandLine) {
@@ -104,7 +117,24 @@ public class ProcessManager implements AutoCloseable {
         this.processEndListeners.get(process).add(listener);
     }
 
-    private void destroyProcesses(){
-        this.processQueue.forEach(Process::destroy);
+    public void observe(final Process process,
+                        final SocketAddress serviceAddress,
+                        final Consumer<Signal> signalHandler) {
+
+        this.monitorEventHandlers.put(serviceAddress, signalHandler);
+
+        com.onReceive(Signal.STATUS_OK, e -> {
+            if (this.monitorEventHandlers.containsKey(e.getReplyAddr())) {
+                this.monitorEventHandlers.get(e.getReplyAddr()).accept(e.getSignal());
+            }
+        });
+
+        this.observers.putIfAbsent(process, new CopyOnWriteArrayList<>());
+        //query the status every 1 second
+        this.observers.get(process)
+                      .add(this.scheduler.scheduleAtFixedRate(() -> com.send(Signal.QUERY_STATUS, serviceAddress),
+                                                              1,
+                                                              1,
+                                                              TimeUnit.SECONDS));
     }
 }

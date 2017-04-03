@@ -27,13 +27,22 @@ public enum Signal {
      */
     QUERY_STATUS(new byte[] { 0x05, 0x53 }),
     /**
+     * Indicates the serivce is ok
+     */
+    STATUS_OK(new byte[]{0x05, 0x06}),
+    /**
      * Indicates a service is starting
      */
     STARTING(new byte[] { 0x53, 0x53 }),
     /**
      * Indicates a service is running and OK
      */
-    OK(new byte[] { 0x4f, 0x4b }),;
+    OK(new byte[] { 0x4f, 0x4b }),
+    /**
+     * Sends a restart signal
+     */
+    RESTART(new byte[]{0x52, 0x53}),
+    ;
 
     private static final Logger LOG = getLogger(Signal.class.getName());
 
