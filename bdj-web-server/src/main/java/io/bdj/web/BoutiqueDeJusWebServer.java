@@ -78,21 +78,27 @@ public class BoutiqueDeJusWebServer {
 
         pool.submit(() -> {
             while (!done.isDone() && watchKey.reset()) {
-                watchKey.pollEvents().stream().map(event -> ((WatchEvent<Path>) event).context()).map(warPath::resolve).filter(warFilePath::equals).filter(p -> filesize(p) > 0).
-                        findFirst().ifPresent(p -> {
-                    waitUntilStable(p, 25, 2000);
-                    final byte[] newMD5 = md5(p);
-                    System.out.println("Checking updated war");
-                    if (!Arrays.equals(md5.getAndSet(newMD5), newMD5)) {
-                        try {
-                            restartWebServer(server, createWebApp(p));
-                        } catch (Exception e) {
-                            LOG.log(Level.SEVERE, e, () -> "Server restart failed");
-                            done.complete(null);
-                        }
-                    }
-                });
-                if (!sleep(50)) {
+                watchKey.pollEvents()
+                        .stream()
+                        .map(event -> ((WatchEvent<Path>) event).context())
+                        .map(warPath::resolve)
+                        .filter(warFilePath::equals)
+                        .filter(p -> filesize(p) > 0)
+                        .findFirst()
+                        .ifPresent(p -> {
+                            waitUntilStable(p, 500, 2000);
+                            final byte[] newMD5 = md5(p);
+                            LOG.info("Checking updated war");
+                            if (!Arrays.equals(md5.getAndSet(newMD5), newMD5)) {
+                                try {
+                                    restartWebServer(server, createWebApp(p));
+                                } catch (Exception e) {
+                                    LOG.log(Level.SEVERE, e, () -> "Server restart failed");
+                                    done.complete(null);
+                                }
+                            }
+                        });
+                if (!sleep(500)) {
                     done.complete(null);
                 }
             }
@@ -128,65 +134,6 @@ public class BoutiqueDeJusWebServer {
         pool.shutdown();
         server.join();
 
-    }
-
-    /**
-     * Waits until there is no more size increase within a given interval
-     *
-     * @param p
-     * @param timeout
-     */
-    private static void waitUntilStable(final Path p, long intervalMs, final long timeout) {
-
-        long timeoutAt = timeout + System.currentTimeMillis();
-        long initialSize;
-        long newSize = filesize(p);
-        //wait until there are no more size increases
-        do {
-            initialSize = newSize;
-            if (!sleep(intervalMs)) {
-                break;
-            }
-            newSize = filesize(p);
-        } while (newSize != -1 && initialSize < newSize && ( timeoutAt > System.currentTimeMillis()));
-    }
-
-    public static boolean sleep(long time) {
-
-        try {
-            Thread.sleep(time);
-            return true;
-        } catch (InterruptedException e) {
-            return false;
-        }
-    }
-
-    public static long filesize(Path p) {
-
-        try {
-            return Files.size(p);
-        } catch (IOException e) {
-            return -1;
-        }
-    }
-
-    public static byte[] md5(Path file) {
-
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            try (InputStream is = Files.newInputStream(file);
-                 DigestInputStream dis = new DigestInputStream(is, md)) {
-                while (dis.read() != -1) {
-                    //noop
-                }
-                return md.digest();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return EMPTY_MD5;
     }
 
     /**
@@ -239,7 +186,8 @@ public class BoutiqueDeJusWebServer {
             classlist.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration",
                                "org.eclipse.jetty.plus.webapp.EnvConfiguration",
                                "org.eclipse.jetty.plus.webapp.PlusConfiguration");
-            classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration", "org.eclipse.jetty.annotations.AnnotationConfiguration");
+            classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+                                "org.eclipse.jetty.annotations.AnnotationConfiguration");
 
             System.setProperty("jetty.jaas.login.conf", "login.conf");
             System.setProperty("jetty.base", ".");
@@ -263,7 +211,7 @@ public class BoutiqueDeJusWebServer {
     private static WebAppContext createWebApp(final Path webappWar) {
 
         final WebAppContext webapp = new WebAppContext();
-        //TODO make context path configurable
+        //webapp.setClassLoader(Thread.currentThread().getContextClassLoader());
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
                             ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$");
 
@@ -275,10 +223,58 @@ public class BoutiqueDeJusWebServer {
         webapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
         webapp.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         webapp.addBean(new ServletContainerInitializersStarter(webapp), true);
-
         webapp.setContextPath("/");
         webapp.setWar(webappWar.toString());
         return webapp;
+    }
+
+    public static byte[] md5(Path file) {
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            try (InputStream is = Files.newInputStream(file);
+                 DigestInputStream dis = new DigestInputStream(is, md)) {
+                while (dis.read() != -1) {
+                    //noop
+                }
+                return md.digest();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return EMPTY_MD5;
+    }
+
+    public static long filesize(Path p) {
+
+        try {
+            return Files.size(p);
+        } catch (IOException e) {
+            return -1;
+        }
+    }
+
+    /**
+     * Waits until there is no more size increase within a given interval
+     *
+     * @param p
+     * @param timeout
+     */
+    private static void waitUntilStable(final Path p, long intervalMs, final long timeout) {
+
+        long timeoutAt = timeout + System.currentTimeMillis();
+        long initialSize;
+        long newSize = filesize(p);
+        //wait until there are no more size increases
+        do {
+            initialSize = newSize;
+            if (!sleep(intervalMs)) {
+                break;
+            }
+            newSize = filesize(p);
+        } while (newSize != -1 && initialSize < newSize && (timeoutAt > System.currentTimeMillis()));
     }
 
     private static void restartWebServer(final Server server, final WebAppContext webApp) throws Exception {
@@ -292,6 +288,16 @@ public class BoutiqueDeJusWebServer {
         server.setHandler(webApp);
         server.start();
         LOG.info("Server restarted");
+    }
+
+    public static boolean sleep(long time) {
+
+        try {
+            Thread.sleep(time);
+            return true;
+        } catch (InterruptedException e) {
+            return false;
+        }
     }
 
     /**

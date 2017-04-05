@@ -23,13 +23,13 @@ public class DerbyStandalone {
 
     public static void main(String... args) throws Exception {
 
-        System.setProperty("derby.system.home", "testdb");
+        System.setProperty("derby.system.home", ".");
         NetworkServerControl server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
         server.start(new PrintWriter(System.out));
         server.setTimeSlice(5);
         server.setMaxThreads(10);
 
-        try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/testDB;create=true");
+        try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/testdb;create=true");
              Statement statement = conn.createStatement()) {
 
             //create the users table
@@ -43,7 +43,7 @@ public class DerbyStandalone {
                                             + "CITY VARCHAR(255), "
                                             + "ZIP VARCHAR(10), "
                                             + "COUNTRY VARCHAR(2)"
-                                            + "");
+                                            + ")");
 
         } catch (SQLException e) {
             if (!DerbyHelper.tableAlreadyExists(e)) {

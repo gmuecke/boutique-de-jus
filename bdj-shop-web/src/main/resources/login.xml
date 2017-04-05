@@ -32,5 +32,9 @@
                 <param name="namespace">/</param>
             </result>
         </action>
+
+        <action name="Register" class="io.bdj.webshop.actions.RegisterAction">
+            <result type="tiles">register</result>
+        </action>
     </package>
 </struts>
