@@ -34,7 +34,9 @@
         </action>
 
         <action name="Register" class="io.bdj.webshop.actions.RegisterAction">
-            <result type="tiles">register</result>
+            <result name="success" type="tiles">register</result>
+            <result name="userexists" type="tiles">register</result>
+            <result name="error" type="tiles">register</result>
         </action>
     </package>
 </struts>

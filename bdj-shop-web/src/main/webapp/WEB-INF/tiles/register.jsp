@@ -9,11 +9,10 @@
     <s:textfield key="zip"/>
     <s:textfield key="country"/>
     <s:textfield key="username"/>
-    <s:password key="password" />
+    <s:password key="password"/>
     <s:submit/>
 </s:form>
 
-<% if("success".equals(request.getAttribute("registration"))){
-  %>Success!<%
-}
-%>
+<% if (request.getAttribute("result") != null) {%>
+<span><%= request.getAttribute("result")%></span>
+<% } %>
