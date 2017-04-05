@@ -5,6 +5,7 @@ import static java.util.logging.Logger.getLogger;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -15,9 +16,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,12 +47,16 @@ public class SignalTransceiver implements AutoCloseable {
 
         this.listenPort = listenPort;
         this.address = thisAddr;
+        InetSocketAddress addr = new InetSocketAddress(thisAddr, listenPort);
         try {
             this.sendChannel = DatagramChannel.open();
             this.receiverChannel = DatagramChannel.open();
             //TODO support blocking/non-block (non-blocking-scheduled?)
             this.receiverChannel.configureBlocking(true);
-            this.receiverChannel.bind(new InetSocketAddress(thisAddr, listenPort));
+
+            this.receiverChannel.bind(addr);
+        } catch (BindException e){
+            throw new RuntimeException("Address " + addr + " already bound", e);
         } catch (IOException e) {
             throw new RuntimeException("Could not open datagram channel", e);
         }
@@ -88,6 +95,32 @@ public class SignalTransceiver implements AutoCloseable {
     public static SignalTransceiver create(InetAddress address, int listenPort) {
 
         return new SignalTransceiver(address, listenPort);
+    }
+
+    public static void acceptAndWait(int listenPort, BiConsumer<SignalTransceiver, CompletableFuture<Event>> prepare){
+        acceptAndWait(InetAddress.getLoopbackAddress(), listenPort, prepare);
+    }
+
+    /**
+     * Creates a transceiver and waits for receiving a stop signal. The method blocks until the future passed
+     * to the preparation consumer is completed. It's up to the consumer on which event the transceiver should stop
+     * @param address
+     *  the address to listen for packets
+     * @param listenPort
+     *  the port to listen for packets (UDP)
+     * @param prepare
+     *  a consumer that gets the instance of the transceiver in order to setup proper actions on receiving events
+     */
+    public static void acceptAndWait(InetAddress address, int listenPort, BiConsumer<SignalTransceiver, CompletableFuture<Event>> prepare){
+        try (SignalTransceiver com = SignalTransceiver.create(listenPort).start()) {
+            CompletableFuture<Event> stopListening = new CompletableFuture<>();
+            prepare.accept(com, stopListening);
+            while (!stopListening.isDone() || stopListening.isCancelled()) {
+                Thread.sleep(150);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failure to receive signals", e);
+        }
     }
 
     public boolean send(Signal signal, SocketAddress dst) {
@@ -133,8 +166,9 @@ public class SignalTransceiver implements AutoCloseable {
         return this;
     }
 
-    public void onReceive(Signal signal, Consumer<Event> consumer) {
+    public SignalTransceiver onReceive(Signal signal, Consumer<Event> consumer) {
         this.consumers.get(signal).add(consumer);
+        return this;
     }
 
     @Override

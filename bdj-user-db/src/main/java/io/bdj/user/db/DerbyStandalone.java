@@ -4,7 +4,10 @@ import static java.util.logging.Logger.getLogger;
 
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Logger;
 
 import io.bdj.util.signals.Signal;
@@ -26,17 +29,25 @@ public class DerbyStandalone {
         server.setTimeSlice(5);
         server.setMaxThreads(10);
 
-        final int stopPort = Integer.parseInt(System.getProperty("bdj.db.signalPort", "11009"));
-        try (SignalTransceiver com = SignalTransceiver.create(stopPort).start()) {
-            final AtomicBoolean running = new AtomicBoolean(true);
-            com.onReceive(Signal.SHUTDOWN, e -> {
-                LOG.info("Received stop signal from " + e.getReplyAddr());
-                running.set(false);
-            });
-            while (running.get()) {
-                Thread.sleep(1000);
+        try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/testDB;create=true");
+             Statement statement = conn.createStatement()) {
+
+            //create the users table
+            statement.executeUpdate("CREATE TABLE USERS (NAME VARCHAR(255), NUMBER INTEGER )");
+
+        } catch (SQLException e) {
+            if (!DerbyHelper.tableAlreadyExists(e)) {
+                throw e;
             }
         }
+
+        final int stopPort = Integer.parseInt(System.getProperty("bdj.db.signalPort", "11009"));
+        SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> {
+            com.onReceive(Signal.SHUTDOWN, e -> {
+                LOG.info("Received stop signal from " + e.getReplyAddr());
+                fut.complete(e);
+            });
+        });
 
     }
 }

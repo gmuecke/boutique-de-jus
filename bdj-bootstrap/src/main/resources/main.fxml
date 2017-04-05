@@ -15,7 +15,7 @@
         </Tab>
         <Tab fx:id="webServerTab" text="WebServer">
             <content>
-                <fx:include source="webServerTab.fxml"/>
+                <fx:include source="webServerTab.fxml" userData="webServer"/>
             </content>
         </Tab>
     </tabs>

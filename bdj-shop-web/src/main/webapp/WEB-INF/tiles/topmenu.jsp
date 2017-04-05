@@ -15,7 +15,10 @@
     </li>
     <%} else { %>
     <li style="float:right">
-        <a href="<s:url action="Login" namespace="/"/>">Register</a><br>
+        <a href="<s:url action="Register" namespace="/"/>">Register</a><br>
+    </li>
+    <li style="float:right">
+        <a href="<s:url action="Login" namespace="/"/>">Login</a><br>
     </li>
     <%}%>
     <li style="float:right">

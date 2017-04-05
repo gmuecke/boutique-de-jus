@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,68 +53,52 @@ public class BoutiqueDeJusWebServer {
         server.start();
 
         final int stopPort = Integer.parseInt(System.getProperty("bdj.web.signalPort", "11008"));
-        try (SignalTransceiver com = SignalTransceiver.create(stopPort).start()) {
-            final AtomicBoolean running = new AtomicBoolean(true);
-            com.onReceive(Signal.QUERY_STATUS, e -> {
-                if(server.isRunning()){
-                    com.send(Signal.STATUS_OK, e.getReplyAddr());
-                }
-            });
-            com.onReceive(Signal.RESTART, e -> {
-                LOG.info("Restarting Server");
-                try {
-                    server.stop();
-                    LOG.info("Sent stop");
-                    server.join();
-                    LOG.info("Server joined");
-
-                    LOG.info("Starting web server");
-                    server.setHandler(createWebApp(cli));
-                    server.start();
-                    LOG.info("Server restarted");
-                    com.send(Signal.OK, e.getReplyAddr());
-                } catch (Exception e1) {
-                    LOG.log(Level.SEVERE, e1, () -> "Restart failed, stopping server");
-                    running.set(false);
-                }
-
-            });
-            com.onReceive(Signal.SHUTDOWN, e -> {
-                LOG.info("Received stop signal from " + e.getReplyAddr());
-                running.set(false);
-                try {
-                    server.stop();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            });
-            while (running.get()) {
-                Thread.sleep(1000);
+        SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
+            if (server.isRunning()) {
+                com.send(Signal.STATUS_OK, e.getReplyAddr());
             }
-        }
+        }).onReceive(Signal.RESTART, e -> {
+            LOG.info("Restarting Server");
+            try {
+                server.stop();
+                LOG.info("Sent stop");
+                server.join();
+                LOG.info("Server joined");
+
+                LOG.info("Starting web server");
+                server.setHandler(createWebApp(cli));
+                server.start();
+                LOG.info("Server restarted");
+                com.send(Signal.OK, e.getReplyAddr());
+            } catch (Exception e1) {
+                LOG.log(Level.SEVERE, e1, () -> "Restart failed, stopping server");
+                fut.complete(e);
+            }
+
+        }).onReceive(Signal.SHUTDOWN, e -> {
+            LOG.info("Received stop signal from " + e.getReplyAddr());
+            fut.complete(e);
+            try {
+                server.stop();
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }));
         server.join();
     }
 
-    private static WebAppContext createWebApp(final CommandLine cli) {
+    /**
+     * Defines the CLI options for the web server.
+     *
+     * @return
+     */
+    private static Options cliOptions() {
 
-        String webappWar = cli.getOptionValue("war");
-        final WebAppContext webapp = new WebAppContext();
-        //TODO make context path configurable
-        webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
-                            ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$");
+        Options opts = new Options();
 
-		/*
-         * Configure the application to support the compilation of JSP files.
-		 * We need a new class loader and some stuff so that Jetty can call the
-		 * onStartup() methods as required.
-		 */
-        webapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
-        webapp.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
-        webapp.addBean(new ServletContainerInitializersStarter(webapp), true);
-
-        webapp.setContextPath("/");
-        webapp.setWar(webappWar);
-        return webapp;
+        opts.addOption("jettyConfig", true, "path to jetty config file");
+        opts.addRequiredOption("w", "war", true, "path to the war file to deploy");
+        return opts;
     }
 
     private static Server createServer(final CommandLine cli) throws Exception {
@@ -157,26 +140,26 @@ public class BoutiqueDeJusWebServer {
         return server;
     }
 
-    private static List<ContainerInitializer> jspInitializers() {
-        JettyJasperInitializer sci = new JettyJasperInitializer();
-        ContainerInitializer initializer = new ContainerInitializer(sci, null);
-        List<ContainerInitializer> initializers = new ArrayList<>();
-        initializers.add(initializer);
-        return initializers;
-    }
+    private static WebAppContext createWebApp(final CommandLine cli) {
 
-    /**
-     * Defines the CLI options for the web server.
-     *
-     * @return
-     */
-    private static Options cliOptions() {
+        String webappWar = cli.getOptionValue("war");
+        final WebAppContext webapp = new WebAppContext();
+        //TODO make context path configurable
+        webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
+                            ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$");
 
-        Options opts = new Options();
+		/*
+         * Configure the application to support the compilation of JSP files.
+		 * We need a new class loader and some stuff so that Jetty can call the
+		 * onStartup() methods as required.
+		 */
+        webapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
+        webapp.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+        webapp.addBean(new ServletContainerInitializersStarter(webapp), true);
 
-        opts.addOption("jettyConfig", true, "path to jetty config file");
-        opts.addRequiredOption("w", "war", true, "path to the war file to deploy");
-        return opts;
+        webapp.setContextPath("/");
+        webapp.setWar(webappWar);
+        return webapp;
     }
 
     /**
@@ -233,6 +216,15 @@ public class BoutiqueDeJusWebServer {
         }
 
         throw new IllegalStateException(String.format("Configured %d Servers, expected 1", serverCount));
+    }
+
+    private static List<ContainerInitializer> jspInitializers() {
+
+        JettyJasperInitializer sci = new JettyJasperInitializer();
+        ContainerInitializer initializer = new ContainerInitializer(sci, null);
+        List<ContainerInitializer> initializers = new ArrayList<>();
+        initializers.add(initializer);
+        return initializers;
     }
 
     public static class JspStarter extends AbstractLifeCycle
