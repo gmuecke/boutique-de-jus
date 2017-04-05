@@ -20,15 +20,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
-import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
+import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
-import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -47,10 +44,12 @@ public class BoutiqueDeJusWebServer {
         CommandLine cli = cliParser.parse(cliOptions(), args);
 
         Server server = createServer(cli);
-        WebAppContext webapp = createWebApp(cli);
+        WebAppContext webapp = createWebApp(cli.getOptionValue("war"));
 
         server.setHandler(webapp);
         server.start();
+
+        //TODO add file watcher to detect modifications to the war file and deploy
 
         final int stopPort = Integer.parseInt(System.getProperty("bdj.web.signalPort", "11008"));
         SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
@@ -60,15 +59,8 @@ public class BoutiqueDeJusWebServer {
         }).onReceive(Signal.RESTART, e -> {
             LOG.info("Restarting Server");
             try {
-                server.stop();
-                LOG.info("Sent stop");
-                server.join();
-                LOG.info("Server joined");
-
-                LOG.info("Starting web server");
-                server.setHandler(createWebApp(cli));
-                server.start();
-                LOG.info("Server restarted");
+                WebAppContext webApp = createWebApp(cli.getOptionValue("war"));
+                restartWebServer(server, webApp);
                 com.send(Signal.OK, e.getReplyAddr());
             } catch (Exception e1) {
                 LOG.log(Level.SEVERE, e1, () -> "Restart failed, stopping server");
@@ -95,6 +87,9 @@ public class BoutiqueDeJusWebServer {
     private static Options cliOptions() {
 
         Options opts = new Options();
+        opts.addOption("tpmx", "threadPoolMax", true, "Thread Pool Max size");
+        opts.addOption("tpmn", "threadPoolMin", true, "Thread Pool Min size");
+        opts.addOption("p", "port", true, "The http port to listen");
 
         opts.addOption("jettyConfig", true, "path to jetty config file");
         opts.addRequiredOption("w", "war", true, "path to the war file to deploy");
@@ -106,7 +101,9 @@ public class BoutiqueDeJusWebServer {
         final Server server;
         if (cli.hasOption("jettyConfig")) {
             LOG.info("Initializing server using config file");
+
             List<URL> configs = Arrays.asList(new File(cli.getOptionValue("jettyConfig")).toURI().toURL());
+
             Map<String, String> props = new HashMap<>();
             props.put("jetty.home", new File(System.getProperty("user.dir")).getCanonicalPath());
 
@@ -114,15 +111,18 @@ public class BoutiqueDeJusWebServer {
 
         } else {
             LOG.info("Initializing server using command line args");
-            //TODO make cli-configurable
-            int threadpool_max = 80; //make configurable
-            int threadpool_min = 10; //make configurable
-            int http_port = 18080; //make configurable
+            int threadpool_max = Integer.parseInt(cli.getOptionValue("tpmx", "80"));
+            int threadpool_min = Integer.parseInt(cli.getOptionValue("tpmn", "10"));
+            int http_port = Integer.parseInt(cli.getOptionValue("p", "8080"));
 
             final QueuedThreadPool threadPool = new QueuedThreadPool(threadpool_max, threadpool_min);
             server = new Server(threadPool);
 
             final ServerConnector connector = new ServerConnector(server);
+            //TODO config set accept queue size
+            //TODO config acceptor num
+            //TODO config selector num
+            //TODO config idle timeout
             connector.setPort(http_port);
             server.addConnector(connector);
 
@@ -133,16 +133,27 @@ public class BoutiqueDeJusWebServer {
             classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
                                 "org.eclipse.jetty.annotations.AnnotationConfiguration");
 
-            HashLoginService loginService = new HashLoginService("BoutiqueDeJusRealm");
-            loginService.setConfig("jcgrealm.txt");
+            System.setProperty("jetty.jaas.login.conf", "login.conf");
+            System.setProperty("jetty.base", ".");
+
+            JAASLoginService loginService = new JAASLoginService();
+            System.setProperty("java.security.auth.login.config", "bdj-web-server/login.conf");
+            //TODO change to DB login
+            loginService.setName("BoutiqueDeJusRealm");
+            loginService.setLoginModuleName("PropertyFile");
+            /*
+            <New class="org.eclipse.jetty.jaas.JAASLoginService">
+                <Set name="Name">BoutiqueDeJusRealm</Set>
+                <Set name="LoginModuleName">PropertyFile</Set>
+            </New>
+            */
             server.addBean(loginService);
         }
         return server;
     }
 
-    private static WebAppContext createWebApp(final CommandLine cli) {
+    private static WebAppContext createWebApp(final String webappWar) {
 
-        String webappWar = cli.getOptionValue("war");
         final WebAppContext webapp = new WebAppContext();
         //TODO make context path configurable
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
@@ -160,6 +171,19 @@ public class BoutiqueDeJusWebServer {
         webapp.setContextPath("/");
         webapp.setWar(webappWar);
         return webapp;
+    }
+
+    private static void restartWebServer(final Server server, final WebAppContext webApp) throws Exception {
+
+        server.stop();
+        LOG.info("Sent stop");
+        server.join();
+        LOG.info("Server joined");
+
+        LOG.info("Starting web server");
+        server.setHandler(webApp);
+        server.start();
+        LOG.info("Server restarted");
     }
 
     /**
@@ -218,6 +242,11 @@ public class BoutiqueDeJusWebServer {
         throw new IllegalStateException(String.format("Configured %d Servers, expected 1", serverCount));
     }
 
+    /**
+     * Initializer to activate JSP support in Jetty.
+     *
+     * @return
+     */
     private static List<ContainerInitializer> jspInitializers() {
 
         JettyJasperInitializer sci = new JettyJasperInitializer();
@@ -225,32 +254,5 @@ public class BoutiqueDeJusWebServer {
         List<ContainerInitializer> initializers = new ArrayList<>();
         initializers.add(initializer);
         return initializers;
-    }
-
-    public static class JspStarter extends AbstractLifeCycle
-            implements ServletContextHandler.ServletContainerInitializerCaller {
-
-        JettyJasperInitializer sci;
-        ServletContextHandler context;
-
-        public JspStarter(ServletContextHandler context) {
-
-            this.sci = new JettyJasperInitializer();
-            this.context = context;
-            this.context.setAttribute("org.apache.tomcat.JarScanner", new StandardJarScanner());
-        }
-
-        @Override
-        protected void doStart() throws Exception {
-
-            ClassLoader old = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(context.getClassLoader());
-            try {
-                sci.onStartup(null, context.getServletContext());
-                super.doStart();
-            } finally {
-                Thread.currentThread().setContextClassLoader(old);
-            }
-        }
     }
 }

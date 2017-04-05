@@ -33,7 +33,17 @@ public class DerbyStandalone {
              Statement statement = conn.createStatement()) {
 
             //create the users table
-            statement.executeUpdate("CREATE TABLE USERS (NAME VARCHAR(255), NUMBER INTEGER )");
+            statement.executeUpdate("CREATE TABLE USERS ("
+                                            + "USERNAME VARCHAR(32) NOT NULL CONSTRAINT USERS_PK PRIMARY KEY,  "
+                                            + "PASSWORD VARCHAR(32), "
+                                            + "LASTNAME VARCHAR(255), "
+                                            + "FIRSTNAME VARCHAR(255), "
+                                            + "EMAIL VARCHAR(255), "
+                                            + "STREET VARCHAR(255), "
+                                            + "CITY VARCHAR(255), "
+                                            + "ZIP VARCHAR(10), "
+                                            + "COUNTRY VARCHAR(2)"
+                                            + "");
 
         } catch (SQLException e) {
             if (!DerbyHelper.tableAlreadyExists(e)) {

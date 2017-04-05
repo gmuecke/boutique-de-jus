@@ -25,6 +25,7 @@ import static java.util.function.Function.identity;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import javax.security.auth.Subject;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
@@ -42,16 +43,24 @@ import org.slf4j.Logger;
  * This login action performs a login using the configured LoginModules to obtain a user Subject
  * in the current session.
  */
-public class Login extends ActionSupport {
+public class AuthAction extends ActionSupport {
 
-    private static final Logger LOG = getLogger(Login.class);
+    private static final Logger LOG = getLogger(AuthAction.class);
 
     private String username;
     private String password;
 
     private AuthSupport jettySupport = new JettySupport();
 
-    public String execute() throws Exception {
+    /**
+     * Performs a login using JAAS / Container authentication. Further the method populates the session
+     * attribute SUBJECT with a JAAS subject for the user. The subject is either populated from the container
+     * such as jetty or an additional JAAS login is performed to obtain the subject.
+     * @return
+     *  SUCCESS if the login was successful, otherwise ERROR is returned.
+     * @throws Exception
+     */
+    public String login() throws Exception {
 
         if (isInvalid(getUsername())) {
             return INPUT;
@@ -79,6 +88,22 @@ public class Login extends ActionSupport {
         //see RunAsInterceptor where we need this
         subject.ifPresent(subj -> session.setAttribute("SUBJECT", subj));
         return subject.map(s -> Action.SUCCESS).orElse(Action.ERROR);
+    }
+
+    /**
+     * Logs out the user and invalidates the session
+     * @return
+     *  the method always returns SUCCESS or throws an error if logout fails.
+     * @throws ServletException
+     */
+    public String logout() throws ServletException {
+        final HttpServletRequest request = ServletActionContext.getRequest();
+        final HttpSession session = request.getSession();
+
+        //perform container login
+        request.logout();
+        session.invalidate();
+        return SUCCESS;
     }
 
     private boolean isInvalid(String value) {

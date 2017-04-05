@@ -19,7 +19,7 @@ public class UserProfileAction extends ActionSupport  {
     @Override
     public String execute() throws Exception {
 
-        String dbURL = "jdbc:derby://localhost:1527/testdb?create=true";
+        String dbURL = "jdbc:derby://localhost:1527/testdb";
         Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
         //Get a connection
         try(Connection conn = DriverManager.getConnection(dbURL);

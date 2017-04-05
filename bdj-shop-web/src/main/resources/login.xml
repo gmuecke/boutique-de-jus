@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+    <package name="auth" namespace="/" extends="struts-default">
+
+        <result-types>
+            <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
+        </result-types>
+        <default-action-ref name="login"/>
+
+        <global-results>
+            <result name="login" type="redirectAction">
+                <param name="actionName">Login</param>
+                <param name="namespace">/</param>
+            </result>
+        </global-results>
+
+        <action name="Login" method="login" class="io.bdj.webshop.actions.AuthAction">
+            <result name="input" type="tiles">login</result>
+            <result name="error" type="tiles">loginError</result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">UserProfile</param>
+                <param name="namespace">/secure</param>
+            </result>
+        </action>
+
+        <action name="Logout" method="logout" class="io.bdj.webshop.actions.AuthAction">
+            <result name="success" type="redirectAction">
+                <param name="actionName">Welcome</param>
+                <param name="namespace">/</param>
+            </result>
+        </action>
+    </package>
+</struts>
