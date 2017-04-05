@@ -12,8 +12,8 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import io.bdj.fx.SpinnerUtil;
 import io.bdj.util.signals.Signal;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -30,11 +30,17 @@ public class WebServerController extends ProcessController {
     @FXML
     public CheckBox debugMode;
     @FXML
-    public Spinner debugPort;
+    public Spinner<Integer> debugPort;
+    @FXML
+    public Spinner<Integer> httpPort;
+    @FXML
+    public Spinner<Integer> minThreads;
+    @FXML
+    public Spinner<Integer> maxThreads;
 
     private SocketAddress addr = new InetSocketAddress(localhost, 11008);
 
-    public void restartServer(ActionEvent actionEvent) {
+    public void restartServer() {
 
         updateProcessStatus(ProcessStatus.RESTARTING);
         com().send(Signal.RESTART, getServiceAddress());
@@ -63,6 +69,11 @@ public class WebServerController extends ProcessController {
             LOG.warning("Could not populate chooser list");
         }
 
+        SpinnerUtil.initializeSpinner(debugPort, 1024, 65535, 1044);
+        SpinnerUtil.initializeSpinner(httpPort, 1024, 65535, 8080);
+        SpinnerUtil.initializeSpinner(minThreads, 10, 65535, 10);
+        SpinnerUtil.initializeSpinner(maxThreads, 10, 65535, 80);
+
     }
 
     @Override
@@ -79,7 +90,10 @@ public class WebServerController extends ProcessController {
                 + classpath
                 + "\""
                 + (debugMode.isSelected() ? " -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + debugPort.getValue() : "")
-                + " io.bdj.web.BoutiqueDeJusWebServer -w "+warChooser.getValue();
+                + " io.bdj.web.BoutiqueDeJusWebServer -w "+warChooser.getValue()
+                + " -p " + httpPort.getValue()
+                + " -tpmn " + minThreads.getValue()
+                + " -tpmx " + maxThreads.getValue();
 
     }
 }

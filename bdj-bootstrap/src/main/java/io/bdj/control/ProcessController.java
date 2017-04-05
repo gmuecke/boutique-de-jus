@@ -105,6 +105,7 @@ public abstract class ProcessController implements Initializable {
                 textElements.remove(0, textElements.size() - consoleTextElements);
         }
         });
+        //TODO support mouse scroll on console area
         scrollPane.vvalueProperty().bind(consoleArea.heightProperty());
 
     }

@@ -3,12 +3,29 @@ package io.bdj.web;
 import static java.util.logging.Logger.getLogger;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +53,8 @@ import org.eclipse.jetty.xml.XmlConfiguration;
  */
 public class BoutiqueDeJusWebServer {
 
+    private static final byte[] EMPTY_MD5 = new byte[0];
+
     private static final Logger LOG = getLogger(BoutiqueDeJusWebServer.class.getName());
 
     public static void main(String... args) throws Exception {
@@ -44,12 +63,40 @@ public class BoutiqueDeJusWebServer {
         CommandLine cli = cliParser.parse(cliOptions(), args);
 
         Server server = createServer(cli);
-        WebAppContext webapp = createWebApp(cli.getOptionValue("war"));
+        final Path warFilePath = Paths.get(cli.getOptionValue("war"));
+        WebAppContext webapp = createWebApp(warFilePath);
 
         server.setHandler(webapp);
         server.start();
 
-        //TODO add file watcher to detect modifications to the war file and deploy
+        final ExecutorService pool = Executors.newFixedThreadPool(1);
+        final WatchService watcher = FileSystems.getDefault().newWatchService();
+        final Path warPath = warFilePath.getParent();
+        final WatchKey watchKey = warPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+        final CompletableFuture done = new CompletableFuture();
+        final AtomicReference<byte[]> md5 = new AtomicReference<>(md5(warFilePath));
+
+        pool.submit(() -> {
+            while (!done.isDone() && watchKey.reset()) {
+                watchKey.pollEvents().stream().map(event -> ((WatchEvent<Path>) event).context()).map(warPath::resolve).filter(warFilePath::equals).filter(p -> filesize(p) > 0).
+                        findFirst().ifPresent(p -> {
+                    waitUntilStable(p, 25, 2000);
+                    final byte[] newMD5 = md5(p);
+                    System.out.println("Checking updated war");
+                    if (!Arrays.equals(md5.getAndSet(newMD5), newMD5)) {
+                        try {
+                            restartWebServer(server, createWebApp(p));
+                        } catch (Exception e) {
+                            LOG.log(Level.SEVERE, e, () -> "Server restart failed");
+                            done.complete(null);
+                        }
+                    }
+                });
+                if (!sleep(50)) {
+                    done.complete(null);
+                }
+            }
+        });
 
         final int stopPort = Integer.parseInt(System.getProperty("bdj.web.signalPort", "11008"));
         SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
@@ -59,7 +106,7 @@ public class BoutiqueDeJusWebServer {
         }).onReceive(Signal.RESTART, e -> {
             LOG.info("Restarting Server");
             try {
-                WebAppContext webApp = createWebApp(cli.getOptionValue("war"));
+                WebAppContext webApp = createWebApp(warFilePath);
                 restartWebServer(server, webApp);
                 com.send(Signal.OK, e.getReplyAddr());
             } catch (Exception e1) {
@@ -75,8 +122,71 @@ public class BoutiqueDeJusWebServer {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
+            //TODO send init OK to hub
         }));
+        done.complete(null);
+        pool.shutdown();
         server.join();
+
+    }
+
+    /**
+     * Waits until there is no more size increase within a given interval
+     *
+     * @param p
+     * @param timeout
+     */
+    private static void waitUntilStable(final Path p, long intervalMs, final long timeout) {
+
+        long timeoutAt = timeout + System.currentTimeMillis();
+        long initialSize;
+        long newSize = filesize(p);
+        //wait until there are no more size increases
+        do {
+            initialSize = newSize;
+            if (!sleep(intervalMs)) {
+                break;
+            }
+            newSize = filesize(p);
+        } while (newSize != -1 && initialSize < newSize && ( timeoutAt > System.currentTimeMillis()));
+    }
+
+    public static boolean sleep(long time) {
+
+        try {
+            Thread.sleep(time);
+            return true;
+        } catch (InterruptedException e) {
+            return false;
+        }
+    }
+
+    public static long filesize(Path p) {
+
+        try {
+            return Files.size(p);
+        } catch (IOException e) {
+            return -1;
+        }
+    }
+
+    public static byte[] md5(Path file) {
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            try (InputStream is = Files.newInputStream(file);
+                 DigestInputStream dis = new DigestInputStream(is, md)) {
+                while (dis.read() != -1) {
+                    //noop
+                }
+                return md.digest();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return EMPTY_MD5;
     }
 
     /**
@@ -90,9 +200,8 @@ public class BoutiqueDeJusWebServer {
         opts.addOption("tpmx", "threadPoolMax", true, "Thread Pool Max size");
         opts.addOption("tpmn", "threadPoolMin", true, "Thread Pool Min size");
         opts.addOption("p", "port", true, "The http port to listen");
-
-        opts.addOption("jettyConfig", true, "path to jetty config file");
         opts.addRequiredOption("w", "war", true, "path to the war file to deploy");
+        opts.addOption("jettyConfig", true, "path to jetty config file");
         return opts;
     }
 
@@ -130,8 +239,7 @@ public class BoutiqueDeJusWebServer {
             classlist.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration",
                                "org.eclipse.jetty.plus.webapp.EnvConfiguration",
                                "org.eclipse.jetty.plus.webapp.PlusConfiguration");
-            classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-                                "org.eclipse.jetty.annotations.AnnotationConfiguration");
+            classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration", "org.eclipse.jetty.annotations.AnnotationConfiguration");
 
             System.setProperty("jetty.jaas.login.conf", "login.conf");
             System.setProperty("jetty.base", ".");
@@ -152,7 +260,7 @@ public class BoutiqueDeJusWebServer {
         return server;
     }
 
-    private static WebAppContext createWebApp(final String webappWar) {
+    private static WebAppContext createWebApp(final Path webappWar) {
 
         final WebAppContext webapp = new WebAppContext();
         //TODO make context path configurable
@@ -169,7 +277,7 @@ public class BoutiqueDeJusWebServer {
         webapp.addBean(new ServletContainerInitializersStarter(webapp), true);
 
         webapp.setContextPath("/");
-        webapp.setWar(webappWar);
+        webapp.setWar(webappWar.toString());
         return webapp;
     }
 
