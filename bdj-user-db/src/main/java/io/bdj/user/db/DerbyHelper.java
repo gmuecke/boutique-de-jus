@@ -18,4 +18,14 @@ public final class DerbyHelper {
         }
         return exists;
     }
+    public static boolean schemaAlreadyExists(final SQLException e) {
+
+        boolean exists;
+        if("X0Y68".equals(e.getSQLState()) && e.getMessage().startsWith("Schema")) {
+            exists = true;
+        } else {
+            exists = false;
+        }
+        return exists;
+    }
 }

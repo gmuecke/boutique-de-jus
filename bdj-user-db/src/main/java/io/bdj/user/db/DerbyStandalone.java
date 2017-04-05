@@ -24,6 +24,9 @@ public class DerbyStandalone {
     public static void main(String... args) throws Exception {
 
         System.setProperty("derby.system.home", ".");
+        System.setProperty("derby.authentication.provider", "BUILTIN");
+        System.setProperty("derby.user.admin", "admin");
+
         NetworkServerControl server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
         server.start(new PrintWriter(System.out));
         server.setTimeSlice(5);
@@ -33,7 +36,8 @@ public class DerbyStandalone {
              Statement statement = conn.createStatement()) {
 
             //create the users table
-            statement.executeUpdate("CREATE TABLE USERS ("
+            statement.executeUpdate("CREATE SCHEMA BOUTIQUE");
+            statement.executeUpdate("CREATE TABLE BOUTIQUE.USERS ("
                                             + "USERNAME VARCHAR(32) NOT NULL CONSTRAINT USERS_PK PRIMARY KEY,  "
                                             + "PASSWORD VARCHAR(32), "
                                             + "LASTNAME VARCHAR(255), "
@@ -44,9 +48,14 @@ public class DerbyStandalone {
                                             + "ZIP VARCHAR(10), "
                                             + "COUNTRY VARCHAR(2)"
                                             + ")");
+            statement.executeUpdate("CREATE TABLE BOUTIQUE.ROLES ("
+                                            + "ROLE VARCHAR(255) ,  "
+                                            + "USERNAME VARCHAR(32)"
+                                            + ")");
+            conn.commit();
 
         } catch (SQLException e) {
-            if (!DerbyHelper.tableAlreadyExists(e)) {
+            if (!DerbyHelper.tableAlreadyExists(e) && !DerbyHelper.schemaAlreadyExists(e)) {
                 throw e;
             }
         }

@@ -56,11 +56,11 @@
         </dependency>
 
         <!-- JDBC Driver -->
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derbyclient</artifactId>
-            <version>${derby.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.derby</groupId>-->
+            <!--<artifactId>derbyclient</artifactId>-->
+            <!--<version>${derby.version}</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>junit</groupId>

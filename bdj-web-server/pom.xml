@@ -14,6 +14,7 @@
     <properties>
         <jetty.version>9.4.2.v20170220</jetty.version>
         <commons.cli.version>1.4</commons.cli.version>
+        <derby.version>10.13.1.1</derby.version>
         <log4j2.version>2.7</log4j2.version>
     </properties>
 
@@ -80,6 +81,11 @@
             <version>${log4j2.version}</version>
         </dependency>
         -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>${derby.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

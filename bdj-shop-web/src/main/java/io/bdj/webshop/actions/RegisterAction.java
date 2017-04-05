@@ -1,9 +1,12 @@
 package io.bdj.webshop.actions;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -11,11 +14,14 @@ import java.util.stream.Stream;
 
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.interceptor.RequestAware;
+import org.slf4j.Logger;
 
 /**
  *
  */
 public class RegisterAction extends ActionSupport implements RequestAware {
+
+    private static final Logger LOG = getLogger(RegisterAction.class);
 
     private String name;
     private String firstname;
@@ -32,6 +38,9 @@ public class RegisterAction extends ActionSupport implements RequestAware {
     public String execute() throws Exception {
 
         //TODO validate data
+        if(username == null) {
+            return SUCCESS;
+        }
 
         String dbURL = "jdbc:derby://localhost:1527/testdb";
         Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
@@ -40,15 +49,12 @@ public class RegisterAction extends ActionSupport implements RequestAware {
         //PERF IDEA don't use prepared statements
         //Get a connection
         try (Connection conn = DriverManager.getConnection(dbURL);
-             PreparedStatement userSearch = conn.prepareStatement("SELECT COUNT (1) AS total FROM USERS WHERE "
+             PreparedStatement userSearch = conn.prepareStatement("SELECT COUNT (1) AS total FROM BOUTIQUE.USERS WHERE "
                                                                           + "username = ?");
              Statement stmt = conn.createStatement()) {
 
-            conn.setAutoCommit(true);
-
             userSearch.setString(1, username);
             ResultSet result = userSearch.executeQuery();
-
             if (result.next() && result.getInt("total") == 0) {
                 String values = Stream.of(username, password, name, firstname, email, street, city, zip, country)
                                       //TODO add SQL injections protection
@@ -56,12 +62,23 @@ public class RegisterAction extends ActionSupport implements RequestAware {
                                       .collect(() -> new StringJoiner(","), StringJoiner::add, StringJoiner::merge)
                                       .toString();
 
-                String query = String.format("INSERT INTO USERS VALUES (%s)", values);
-                stmt.executeUpdate(query);
+                String userInsert = String.format("INSERT INTO BOUTIQUE.USERS VALUES (%s)", values);
+                String roleInsert = String.format("INSERT INTO BOUTIQUE.ROLES (role, username) VALUES ('users', '%s')",
+                                                  username);
+                try{
+                stmt.executeUpdate(userInsert);
+                stmt.executeUpdate(roleInsert);
+                conn.commit();
                 request.put("result", "User created");
+                } catch (SQLException e) {
+                    conn.rollback();
+                    request.put("result", "Update failed");
+                    LOG.error("User registration failed", e);
+                }
             } else {
                 request.put("result", "User already exists");
             }
+
         }
 
         return SUCCESS;

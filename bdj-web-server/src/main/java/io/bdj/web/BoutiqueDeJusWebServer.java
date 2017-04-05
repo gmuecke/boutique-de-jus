@@ -196,7 +196,9 @@ public class BoutiqueDeJusWebServer {
             System.setProperty("java.security.auth.login.config", "bdj-web-server/login.conf");
             //TODO change to DB login
             loginService.setName("BoutiqueDeJusRealm");
-            loginService.setLoginModuleName("PropertyFile");
+//            loginService.setLoginModuleName("PropertyFile");
+            //TODO support admin
+            loginService.setLoginModuleName("Boutique");
             /*
             <New class="org.eclipse.jetty.jaas.JAASLoginService">
                 <Set name="Name">BoutiqueDeJusRealm</Set>

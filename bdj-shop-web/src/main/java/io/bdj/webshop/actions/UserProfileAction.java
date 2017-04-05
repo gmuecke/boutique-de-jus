@@ -23,13 +23,13 @@ public class UserProfileAction extends ActionSupport  {
         Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
         //Get a connection
         try(Connection conn = DriverManager.getConnection(dbURL);
-            PreparedStatement statement = conn.prepareStatement("SELECT * from USERS")) {
+            PreparedStatement statement = conn.prepareStatement("SELECT * from BOUTIQUE.USERS")) {
                 ResultSet resultSet = statement.executeQuery();
 
                 List<String> names = new ArrayList<>();
                 while (resultSet.next()) {
 
-                    String user = resultSet.getString("name");
+                    String user = resultSet.getString("LASTNAME");
                     names.add(user);
                 }
                 this.names = names;
