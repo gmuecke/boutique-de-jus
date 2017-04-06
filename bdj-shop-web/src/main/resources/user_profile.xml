@@ -8,17 +8,20 @@
         <result-types>
             <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
         </result-types>
+        <!-- most likely we don't need this intercepter here, keep it as an example of how to use it here until
+             it is used elsewhere
         <interceptors>
             <interceptor name="authentication"
                          class="io.bdj.webshop.interceptor.RunAsInterceptor"></interceptor>
         </interceptors>
+        -->
         <default-action-ref name="UserProfile"/>
         <global-results>
             <result name="login" type="redirect">/j_security_check.jsp</result>
         </global-results>
 
-        <action name="UserProfile" class="io.bdj.webshop.actions.UserProfileAction">
-             <interceptor-ref name="authentication"/>
+        <action name="UserProfile_*" method="{1}" class="io.bdj.webshop.actions.UserProfileAction">
+             <!-- <interceptor-ref name="authentication"/> -->
             <result type="tiles">userProfile</result>
         </action>
 

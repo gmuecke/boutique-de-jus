@@ -23,7 +23,7 @@ public class RegisterAction extends ActionSupport implements RequestAware {
 
     private static final Logger LOG = getLogger(RegisterAction.class);
 
-    private String name;
+    private String lastname;
     private String firstname;
     private String email;
     private String street;
@@ -56,7 +56,7 @@ public class RegisterAction extends ActionSupport implements RequestAware {
             userSearch.setString(1, username);
             ResultSet result = userSearch.executeQuery();
             if (result.next() && result.getInt("total") == 0) {
-                String values = Stream.of(username, password, name, firstname, email, street, city, zip, country)
+                String values = Stream.of(username, password, lastname, firstname, email, street, city, zip, country)
                                       //TODO add SQL injections protection
                                       .map(s -> '\'' + s + '\'')
                                       .collect(() -> new StringJoiner(","), StringJoiner::add, StringJoiner::merge)
@@ -84,14 +84,14 @@ public class RegisterAction extends ActionSupport implements RequestAware {
         return SUCCESS;
     }
 
-    public String getName() {
+    public String getLastname() {
 
-        return name;
+        return lastname;
     }
 
-    public void setName(final String name) {
+    public void setLastname(final String lastname) {
 
-        this.name = name;
+        this.lastname = lastname;
     }
 
     public String getFirstname() {
