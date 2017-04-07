@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+    <package name="shop" namespace="/" extends="struts-default">
+
+        <result-types>
+            <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
+        </result-types>
+
+        <default-action-ref name="Shop"/>
+
+        <action name="juices" class="io.bdj.webshop.actions.ShopAction">
+            <result type="tiles">juices</result>
+        </action>
+
+        <action name="accessoires"  class="io.bdj.webshop.actions.ShopAction">
+            <result type="tiles">accessoires</result>
+        </action>
+
+        <action name="books"  class="io.bdj.webshop.actions.ShopAction">
+            <result type="tiles">books</result>
+        </action>
+
+        <action name="courses"  class="io.bdj.webshop.actions.ShopAction">
+            <result type="tiles">courses</result>
+        </action>
+
+    </package>
+</struts>

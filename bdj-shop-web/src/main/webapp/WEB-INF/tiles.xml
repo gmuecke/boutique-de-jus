@@ -5,6 +5,7 @@
 <tiles-definitions>
 
     <definition name="baseLayout" template="/WEB-INF/tiles/layout.jsp">
+
         <put-attribute name="header" value="/WEB-INF/tiles/header.jsp"/>
         <put-attribute name="topmenu"   value="/WEB-INF/tiles/topmenu.jsp"/>
         <put-attribute name="menu"   value="/WEB-INF/tiles/menu.jsp"/>
@@ -35,5 +36,23 @@
     <definition name="userProfile" extends="baseLayout" role="users">
         <put-attribute name="title"  value="UserProfile"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/userprofile.jsp"/>
+    </definition>
+
+    <!-- Shop content-->
+    <definition name="juices" extends="baseLayout" >
+        <put-attribute name="title"  value="Juice Shop - Juices"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/juices.jsp"/>
+    </definition>
+    <definition name="accessoires" extends="baseLayout" >
+        <put-attribute name="title"  value="Juice Shop - Accessoires"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/accessoires.jsp"/>
+    </definition>
+    <definition name="books" extends="baseLayout" >
+        <put-attribute name="title"  value="Juice Shop - Books"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/books.jsp"/>
+    </definition>
+    <definition name="courses" extends="baseLayout" >
+        <put-attribute name="title"  value="Juice Shop - Courses"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/courses.jsp"/>
     </definition>
 </tiles-definitions>

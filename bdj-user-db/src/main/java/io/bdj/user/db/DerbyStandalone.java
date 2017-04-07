@@ -52,6 +52,18 @@ public class DerbyStandalone {
                                             + "ROLE VARCHAR(255) ,  "
                                             + "USERNAME VARCHAR(32)"
                                             + ")");
+
+            statement.executeUpdate("CREATE TABLE BOUTIQUE.PRODUCTS ("
+                                            + "ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) CONSTRAINT PRODUCT_PK PRIMARY KEY"
+                                            + "NAME VARCHAR(255) ,  "
+                                            + "DESCRIPTION VARCHAR(1024), "
+                                            + "CATEGORY ENUM('Juice','Book','Accessoire','Course'), "
+                                            + "TAGS VARCHAR(255), "
+                                            + "IMAGE BLOB(102400), "
+                                            + "PRICE DECIMAL (100,2)"
+                                            + ")");
+
+
             conn.commit();
 
         } catch (SQLException e) {

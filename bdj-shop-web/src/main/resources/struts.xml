@@ -9,6 +9,7 @@
     <include file="login.xml"/>
     <include file="welcome_page.xml"/>
     <include file="user_profile.xml"/>
+    <include file="shop.xml"/>
 
     <package name="default" namespace="/" extends="struts-default">
         <result-types>
