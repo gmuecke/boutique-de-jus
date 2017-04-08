@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Apple Juice",
+    "description": "Pure and fresh Apple Juice",
+    "category": "Juice",
+    "tags": [
+      "juice",
+      "apple",
+      "fruit"
+    ],
+    "image": "/images/apple_juice.jpg",
+    "price": 2.99
+  },
+  {
+    "name": "Banana Juice",
+    "description": "Healthy Banana Juice",
+    "category": "Juice",
+    "tags": [
+      "juice",
+      "banana",
+      "fruit"
+    ],
+    "image": "/images/banana_juice.jpg",
+    "price": 3.99
+  },
+  {
+    "name": "Eggfruit Juice",
+    "description": "Eggy eggfruit Juice",
+    "category": "Juice",
+    "tags": [
+      "juice",
+      "eggfruit",
+      "fruit"
+    ],
+    "image": "/images/eggfruit_juice.jpg",
+    "price": 5.99
+  },
+  {
+    "name": "Fruit Press",
+    "description": "Produce your own juice!",
+    "category": "Accessoires",
+    "tags": [
+      "juice",
+      "accessoire",
+      "press"
+    ],
+    "image": "/images/fruit_press.jpg",
+    "price": 599.00
+  },
+  {
+    "name": "Lemon Juice",
+    "description": "Lemon Juice",
+    "category": "Juice",
+    "tags": [
+      "juice",
+      "lemon",
+      "fruit"
+    ],
+    "image": "/images/lemon_juice.jpg",
+    "price": 4.49
+  },
+  {
+    "name": "Orange Juice",
+    "description": "Orange Juice",
+    "category": "Juice",
+    "tags": [
+      "juice",
+      "orange",
+      "fruit"
+    ],
+    "image": "/images/orange_juice.jpg",
+    "price": 3.49
+  },
+  {
+    "name": "Quince Juice",
+    "description": "Quince Juice",
+    "category": "Juice",
+    "tags": [
+      "juice",
+      "quince",
+      "fruit"
+    ],
+    "image": "/images/quince.jpg",
+    "price": 4.25
+  }
+]

@@ -15,7 +15,7 @@
         <!-- shop modules -->
         <dependency>
             <groupId>io.bdj</groupId>
-            <artifactId>bdj-user-db</artifactId>
+            <artifactId>bdj-db-server</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -44,6 +44,7 @@
 
     <build>
         <plugins>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -72,6 +73,7 @@
                     <overWriteSnapshots>true</overWriteSnapshots>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 

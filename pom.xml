@@ -7,11 +7,11 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
+        <module>bdj-db-server</module>
         <module>bdj-web-server</module>
-        <module>bdj-bootstrap</module>
         <module>bdj-shop-web</module>
-        <module>bdj-user-db</module>
         <module>bdj-utils</module>
+        <module>bdj-bootstrap</module>
         <module>perftest-gatling</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>

@@ -24,7 +24,7 @@ public class UserProfileAction extends ActionSupport implements RequestAware{
 
     private static final Logger LOG = getLogger(UserProfileAction.class);
 
-    String dbURL = "jdbc:derby://localhost:1527/testdb";
+    private String dbURL = "jdbc:derby://localhost:1527/testdb";
     private String lastname;
     private String firstname;
     private String email;
