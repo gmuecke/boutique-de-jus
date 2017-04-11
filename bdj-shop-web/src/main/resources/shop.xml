@@ -7,24 +7,19 @@
 
         <result-types>
             <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
+            <result-type name="imageResult" class="io.bdj.webshop.result.ImageResult"/>
         </result-types>
 
-        <default-action-ref name="Shop"/>
 
-        <action name="juices" class="io.bdj.webshop.actions.ShopAction">
-            <result type="tiles">juices</result>
+        <default-action-ref name="products_*"/>
+
+        <action name="products_*" method="{1}" class="io.bdj.webshop.actions.ShopAction">
+            <result type="tiles">{1}</result>
+            <allowed-methods>juices,accessoires,books,courses</allowed-methods>
         </action>
 
-        <action name="accessoires"  class="io.bdj.webshop.actions.ShopAction">
-            <result type="tiles">accessoires</result>
-        </action>
-
-        <action name="books"  class="io.bdj.webshop.actions.ShopAction">
-            <result type="tiles">books</result>
-        </action>
-
-        <action name="courses"  class="io.bdj.webshop.actions.ShopAction">
-            <result type="tiles">courses</result>
+        <action name="productImage" class="io.bdj.webshop.actions.ProductImageAction">
+            <result name="success" type="imageResult"/>
         </action>
 
     </package>
