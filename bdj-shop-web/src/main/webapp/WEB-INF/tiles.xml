@@ -55,4 +55,10 @@
         <put-attribute name="title"  value="Juice Shop - Courses"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/shop/courses.jsp"/>
     </definition>
+
+    <!-- order process -->
+    <definition name="cart" extends="baseLayout" >
+        <put-attribute name="title"  value="Shopping cart"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/cart.jsp"/>
+    </definition>
 </tiles-definitions>

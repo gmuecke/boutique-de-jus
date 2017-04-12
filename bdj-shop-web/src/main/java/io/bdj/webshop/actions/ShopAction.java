@@ -30,7 +30,7 @@ public class ShopAction extends ActionSupport implements SessionAware{
 
     public String juices() throws Exception {
 
-        return queryProducts("Juices");
+        return queryProducts("Juice");
     }
 
     public String accessoires() throws Exception {
@@ -51,9 +51,9 @@ public class ShopAction extends ActionSupport implements SessionAware{
         //TODO PERF IDEA do caller-side filtering (no where clause)
         Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
         try (Connection conn = DriverManager.getConnection(dbURL);
-             PreparedStatement statement = conn.prepareStatement("SELECT * FROM BOUTIQUE.PRODUCTS")) {
+             PreparedStatement statement = conn.prepareStatement("SELECT * FROM BOUTIQUE.PRODUCTS WHERE CATEGORY = ?")) {
 
-            //statement.setString(1, category);
+            statement.setString(1, category);
             final ResultSet rs = statement.executeQuery();
             while (rs.next()) {
 

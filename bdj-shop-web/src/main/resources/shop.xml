@@ -22,5 +22,10 @@
             <result name="success" type="imageResult"/>
         </action>
 
+        <action name="cart_*" method="{1}" class="io.bdj.webshop.actions.CartAction">
+            <result type="tiles">cart</result>
+            <result name="redirect" type="redirect">${url}</result>
+            <allowed-methods>add</allowed-methods>
+        </action>
     </package>
 </struts>

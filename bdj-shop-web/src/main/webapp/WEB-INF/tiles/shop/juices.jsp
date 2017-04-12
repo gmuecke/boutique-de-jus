@@ -1,6 +1,7 @@
 <%@taglib uri="/struts-tags" prefix="s" %>
 
 <h1>Juice Shop</h1>
+<s:url forceAddSchemeHostAndPort="true" includeParams="all" var="url"/>
 
 <table>
     <s:iterator value="products">
@@ -16,6 +17,14 @@
             <td><s:property value="category"/></td>
             <td><s:property value="tags"/></td>
             <td><s:property value="price"/></td>
+            <td>
+                <s:form action="cart_add">
+                    <s:hidden name="url" value="%{url}"/>
+                    <s:textfield name="quantity" key="quantity"/>
+                    <s:hidden name="id" value="%{id}"/>
+                    <s:submit/>
+                </s:form>
+            </td>
         </tr>
     </s:iterator>
 </table>
