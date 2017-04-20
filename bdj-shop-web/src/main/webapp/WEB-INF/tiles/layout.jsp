@@ -1,5 +1,6 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
+<s:url forceAddSchemeHostAndPort="true" includeParams="all" var="url"/>
 <!DOCTYPE html>
 <html>
     <head>

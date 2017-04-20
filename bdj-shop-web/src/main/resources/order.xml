@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+    <package name="order" namespace="/secure" extends="struts-default">
+
+        <result-types>
+            <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
+        </result-types>
+
+        <action name="order_*" method="{1}" class="io.bdj.webshop.actions.OrderAction">
+            <result type="tiles">order</result>
+            <allowed-methods>show,submit</allowed-methods>
+        </action>
+
+    </package>
+
+
+</struts>

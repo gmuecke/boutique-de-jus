@@ -54,6 +54,7 @@ public class ProductImageAction extends ActionSupport implements ServletRequestA
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             LOG.error("Could not load DB Driver", e);
         }
+        //TODO throw proper exception when image data could not be fetched
         return IOUtils.toByteArray(getUndefinedImage());
     }
 

@@ -10,6 +10,7 @@
     <include file="welcome_page.xml"/>
     <include file="user_profile.xml"/>
     <include file="shop.xml"/>
+    <include file="order.xml"/>
 
     <package name="default" namespace="/" extends="struts-default">
         <result-types>

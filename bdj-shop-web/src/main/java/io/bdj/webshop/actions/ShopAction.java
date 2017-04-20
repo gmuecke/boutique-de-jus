@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.opensymphony.xwork2.ActionSupport;
-import io.bdj.webshop.model.Product;
+import io.bdj.model.Product;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**

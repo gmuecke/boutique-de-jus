@@ -3,19 +3,33 @@
 <h1>Your shopping cart</h1>
 
 <table>
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+
+    </thead>
     <s:iterator value="cart">
         <tr>
-            <td><s:property value="key"/>:<s:property value="value"/></td>
-            <td><s:property value="key.name"/></td>
             <td>
                 <img src="<s:url action="productImage" >
                             <s:param name="id" value="key.id"/>
                           </s:url>"/>
             </td>
-            <td><s:property value="key.decsription"/></td>
+            <td><s:property value="key.name"/></td>
             <td><s:property value="key.price"/></td>
             <td><s:property value="value"/></td>
         </tr>
     </s:iterator>
+    <tfoot>
+        <tr>
+            <td colspan="3">Total:</td>
+            <td><s:property value="total"/> $</td>
+        </tr>
+    </tfoot>
 </table>
-<p>Total: <s:property value="total"/> $</p>
+
+<a href="<s:url action="order_show" namespace="/secure"/>" >Submit Order</a><br>

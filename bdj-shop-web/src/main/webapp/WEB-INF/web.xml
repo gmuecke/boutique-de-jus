@@ -23,6 +23,9 @@
     <listener>
         <listener-class>org.apache.struts2.tiles.StrutsTilesListener</listener-class>
     </listener>
+    <listener>
+        <listener-class>io.bdj.webshop.listener.ServiceInitializer</listener-class>
+    </listener>
 
     <security-constraint>
         <web-resource-collection>
@@ -57,5 +60,4 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-
 </web-app>

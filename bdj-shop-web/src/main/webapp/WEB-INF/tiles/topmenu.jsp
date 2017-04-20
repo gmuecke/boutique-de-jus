@@ -12,7 +12,7 @@
     </li>
     <%}%>
     <li style="float:right">
-        <a href="<s:url action="cart" namespace="/"/>">Cart</a><br>
+        <a href="<s:url action="cart_" namespace="/"/>">Cart</a><br>
     </li>
     <% if (username != null) { %>
     <li style="float:right">

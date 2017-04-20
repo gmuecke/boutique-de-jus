@@ -1,4 +1,4 @@
-package io.bdj.webshop.model;
+package io.bdj.model;
 
 import static java.util.stream.Collectors.toList;
 

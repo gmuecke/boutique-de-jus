@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.opensymphony.xwork2.ActionSupport;
-import io.bdj.webshop.model.Cart;
-import io.bdj.webshop.model.Product;
+import io.bdj.model.Cart;
+import io.bdj.model.Product;
 import org.apache.struts2.interceptor.SessionAware;
 import org.slf4j.Logger;
 
@@ -26,9 +26,9 @@ public class CartAction extends ActionSupport implements SessionAware {
     private static final Logger LOG = getLogger(CartAction.class);
 
     private String dbURL = "jdbc:derby://localhost:1527/testdb";
+    private Map<Product, Integer> cart = new HashMap<>();
     private Map<String, Object> session;
 
-    private Map<Product, Integer> cart = new HashMap<>();
     private double total;
     private String url;
     private String id;

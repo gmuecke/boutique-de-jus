@@ -1,9 +1,9 @@
-package io.bdj.webshop.model;
+package io.bdj.model;
 
 import java.util.List;
 
 /**
- *
+ * Resembles a single product of the shop
  */
 public class Product {
 

@@ -61,4 +61,8 @@
         <put-attribute name="title"  value="Shopping cart"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/shop/cart.jsp"/>
     </definition>
+    <definition name="order" extends="baseLayout" >
+        <put-attribute name="title"  value="Order Confirmation"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/order.jsp"/>
+    </definition>
 </tiles-definitions>
