@@ -41,6 +41,7 @@ import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.jaas.JAASLoginService;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -65,6 +66,10 @@ public class BoutiqueDeJusWebServer {
         Server server = createServer(cli);
         final Path warFilePath = Paths.get(cli.getOptionValue("war"));
         WebAppContext webapp = createWebApp(warFilePath);
+
+        //TODO make the database url configurable
+        server.addBean(new EnvEntry("databaseUrl","jdbc:derby://localhost:1527/testdb"));
+        server.addBean(new EnvEntry("databaseDriver","org.apache.derby.jdbc.ClientDriver"));
 
         server.setHandler(webapp);
         server.start();

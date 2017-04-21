@@ -1,16 +1,13 @@
 package io.bdj.webshop.actions;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.opensymphony.xwork2.ActionSupport;
 import io.bdj.model.Product;
+import io.bdj.service.ProductService;
+import io.bdj.service.Services;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
@@ -18,7 +15,7 @@ import org.apache.struts2.interceptor.SessionAware;
  */
 public class ShopAction extends ActionSupport implements SessionAware{
 
-    private String dbURL = "jdbc:derby://localhost:1527/testdb";
+    private ProductService productService = Services.getService(ProductService.class);
     private List<Product> products = new ArrayList<>();
     private Map<String, Object> session;
 
@@ -47,29 +44,8 @@ public class ShopAction extends ActionSupport implements SessionAware{
     }
 
     public String queryProducts(String category) throws Exception {
-        //TODO PERF IDEA don't use a prepared statement here
         //TODO PERF IDEA do caller-side filtering (no where clause)
-        Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-        try (Connection conn = DriverManager.getConnection(dbURL);
-             PreparedStatement statement = conn.prepareStatement("SELECT * FROM BOUTIQUE.PRODUCTS WHERE CATEGORY = ?")) {
-
-            statement.setString(1, category);
-            final ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-
-                Product prod = new Product();
-                prod.setId(rs.getInt("id"));
-                prod.setName(rs.getString("pname"));
-                prod.setDescription(rs.getString("description"));
-                prod.setCategory(rs.getString("category"));
-                prod.setTags(Arrays.asList(rs.getString("tags").split(",")));
-                //TODO PERF IDEA include unneeded images
-                prod.setImage(rs.getBytes("image"));
-                prod.setPrice(rs.getDouble("price"));
-                products.add(prod);
-            }
-        }
-
+        this.products.addAll(productService.findProductsByCategory(category));
         return SUCCESS;
 
     }

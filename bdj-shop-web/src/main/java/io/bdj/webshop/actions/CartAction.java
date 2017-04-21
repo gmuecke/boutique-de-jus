@@ -2,12 +2,6 @@ package io.bdj.webshop.actions;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,6 +9,8 @@ import java.util.stream.Collectors;
 import com.opensymphony.xwork2.ActionSupport;
 import io.bdj.model.Cart;
 import io.bdj.model.Product;
+import io.bdj.service.ProductService;
+import io.bdj.service.Services;
 import org.apache.struts2.interceptor.SessionAware;
 import org.slf4j.Logger;
 
@@ -25,7 +21,8 @@ public class CartAction extends ActionSupport implements SessionAware {
 
     private static final Logger LOG = getLogger(CartAction.class);
 
-    private String dbURL = "jdbc:derby://localhost:1527/testdb";
+    private ProductService productService = Services.getService(ProductService.class);
+
     private Map<Product, Integer> cart = new HashMap<>();
     private Map<String, Object> session;
 
@@ -37,46 +34,23 @@ public class CartAction extends ActionSupport implements SessionAware {
     @Override
     public String execute() throws Exception {
 
-        Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-
         Cart sessionCart = (Cart) session.get("cart");
-
-
-        if(sessionCart == null) {
+        if (sessionCart == null) {
             //TODO display cart is empty something message
             return SUCCESS;
         }
+        this.cart.putAll(sessionCart.getProducts()
+                                    .stream()
+                                    .collect(Collectors.toMap(productService::readProduct, Cart.CartEntry::getQuantity)));
 
-        //PERF BUG GMUE open a connection per item in the stream
-        this.cart.putAll(sessionCart.getProducts().stream().collect(Collectors.toMap(ce -> {
-            try (Connection conn = DriverManager.getConnection(dbURL);
-                 PreparedStatement statement = conn.prepareStatement("SELECT * FROM BOUTIQUE.PRODUCTS WHERE ID = ?")) {
-
-                statement.setString(1, ce.getProductId());
-                final ResultSet rs = statement.executeQuery();
-                if (rs.next()) {
-
-                    Product prod = new Product();
-                    prod.setId(rs.getInt("id"));
-                    prod.setName(rs.getString("pname"));
-                    prod.setDescription(rs.getString("description"));
-                    prod.setCategory(rs.getString("category"));
-                    prod.setTags(Arrays.asList(rs.getString("tags").split(",")));
-                    //TODO PERF IDEA include unneeded images
-                    prod.setImage(rs.getBytes("image"));
-                    prod.setPrice(rs.getDouble("price"));
-                    return prod;
-                }
-                throw new RuntimeException("Could not find product with id " + ce.getProductId());
-            } catch (SQLException e) {
-                throw new RuntimeException("Could not fetch product details", e);
-            }
-        }, Cart.CartEntry::getQuantity)));
-
-        this.total = this.cart.entrySet().stream().collect(Collectors.summingDouble(e -> e.getKey().getPrice() * e.getValue()));
+        this.total = this.cart.entrySet()
+                              .stream()
+                              .collect(Collectors.summingDouble(e -> e.getKey().getPrice() * e.getValue()));
 
         return SUCCESS;
     }
+
+
 
     public String add() throws Exception {
 

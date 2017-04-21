@@ -60,4 +60,9 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+    
+    <env-entry>
+        <env-entry-name>databaseUrl</env-entry-name>
+        <env-entry-type>java.lang.String</env-entry-type>
+    </env-entry>
 </web-app>

@@ -2,12 +2,16 @@ package io.bdj.webshop.listener;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import io.bdj.service.PrintOrderService;
+import io.bdj.service.CustomerService;
+import io.bdj.service.OrderService;
+import io.bdj.service.ProductService;
+import io.bdj.service.Services;
+import io.bdj.service.impl.DirectConnectJdbcCustomerService;
+import io.bdj.service.impl.DirectConnectJdbcProductService;
+import io.bdj.service.impl.PrintOrderService;
 import org.slf4j.Logger;
 
 /**
@@ -20,25 +24,17 @@ public class ServiceInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
-        try {
-            InitialContext ic = new InitialContext();
-            ic.bind("java:comp/env/orderService", new PrintOrderService());
-
-        } catch (NamingException e) {
-            LOG.warn("Could not initialize services");
-        }
-
+        Services.bind(OrderService.class, new PrintOrderService());
+        Services.bind(CustomerService.class, new DirectConnectJdbcCustomerService());
+        Services.bind(ProductService.class, new DirectConnectJdbcProductService());
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
 
-        try {
-            InitialContext ic = new InitialContext();
-            ic.unbind("services/order");
-        } catch (NamingException e) {
-            LOG.warn("Could not deregister services");
-        }
+        Services.unbind(OrderService.class);
+        Services.unbind(CustomerService.class);
+        Services.unbind(ProductService.class);
     }
 
 

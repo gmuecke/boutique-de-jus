@@ -1,15 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <s:form action="Register">
-    <s:textfield key="lastname"/>
-    <s:textfield key="firstname"/>
-    <s:textfield key="email"/>
-    <s:textfield key="street"/>
-    <s:textfield key="city"/>
-    <s:textfield key="zip"/>
-    <s:textfield key="country"/>
-    <s:textfield key="username"/>
-    <s:password key="password"/>
+    <s:textfield key="customer.lastname"/>
+    <s:textfield key="customer.firstname"/>
+    <s:textfield key="customer.email"/>
+    <s:textfield key="customer.street"/>
+    <s:textfield key="customer.city"/>
+    <s:textfield key="customer.zip"/>
+    <s:textfield key="customer.country"/>
+    <s:textfield key="customer.username"/>
+    <s:password key="customer.password"/>
     <s:submit/>
 </s:form>
 
