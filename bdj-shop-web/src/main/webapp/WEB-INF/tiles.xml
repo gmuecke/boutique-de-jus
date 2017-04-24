@@ -65,4 +65,8 @@
         <put-attribute name="title"  value="Order Confirmation"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/shop/order.jsp"/>
     </definition>
+    <definition name="orderSuccess" extends="baseLayout" >
+        <put-attribute name="title"  value="Order Success"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/orderSuccess.jsp"/>
+    </definition>
 </tiles-definitions>

@@ -56,7 +56,7 @@ public class OrderAction extends ActionSupport implements SessionAware {
                               .stream()
                               .collect(Collectors.summingDouble(e -> e.getKey().getPrice() * e.getValue()));
 
-        return SUCCESS;
+        return INPUT;
     }
 
 
