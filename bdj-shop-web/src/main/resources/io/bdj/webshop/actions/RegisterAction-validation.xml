@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE validators PUBLIC "-//Apache Struts//XWork Validator 1.0.3//EN" "http://struts.apache.org/dtds/xwork-validator-1.0.3.dtd">
+<validators>
+    <field name="customer.username">
+        <field-validator type="requiredstring">
+            <message>A username must be supplied</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="maxLength">32</param>
+            <message>Username must not exceed ${maxLength}</message>
+        </field-validator>
+    </field>
+    <field name="customer.firstname">
+        <field-validator type="requiredstring">
+            <message>A firstname must be supplied</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="maxLength">255</param>
+            <message>Firstname must not exceed ${maxLength}</message>
+        </field-validator>
+    </field>
+    <field name="customer.lastname">
+        <field-validator type="requiredstring">
+            <message>A lastname must be supplied</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="maxLength">255</param>
+            <message>Lastname must not exceed ${maxLength}</message>
+        </field-validator>
+    </field>
+    <field name="customer.email">
+        <field-validator type="email">
+            <message>Email must be valid</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="maxLength">255</param>
+            <message>Email must not exceed ${maxLength}</message>
+        </field-validator>
+    </field>
+    <field name="customer.city">
+        <field-validator type="requiredstring">
+            <message>A city must be supplied</message>
+        </field-validator>
+    </field>
+    <field name="customer.street">
+        <field-validator type="requiredstring">
+            <message>A street must be supplied</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="maxLength">255</param>
+            <message>Street must not exceed ${maxLength}</message>
+        </field-validator>
+    </field>
+    <field name="customer.zip">
+        <field-validator type="stringlength">
+            <param name="maxLength">10</param>
+            <message>A zip must be supplied</message>
+        </field-validator>
+    </field>
+    <field name="customer.country">
+        <field-validator type="regex">
+            <param name="caseSensitive">false</param>
+            <param name="regex">[A-Z]{2}</param>
+            <message>A country must be supplied</message>
+        </field-validator>
+    </field>
+    <field name="customer.password">
+        <field-validator type="requiredstring">
+            <message>A password must be supplied</message>
+        </field-validator>
+        <field-validator type="stringlength">
+            <param name="maxLength">32</param>
+            <message>Password must not exceed ${maxLength}</message>
+        </field-validator>
+    </field>
+</validators>

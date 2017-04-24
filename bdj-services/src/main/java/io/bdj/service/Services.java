@@ -25,7 +25,7 @@ public final class Services {
         ServiceAddress addr = getServiceAddress(serviceClass);
         try {
             InitialContext ic = new InitialContext();
-            ic.bind(addr.value(), service);
+            ic.rebind(addr.value(), service);
         } catch (NamingException e) {
             throw new ServiceRuntimeException("Could not bind service " + serviceClass);
         }
@@ -43,7 +43,7 @@ public final class Services {
             InitialContext ic = new InitialContext();
             ic.unbind(addr.value());
         } catch (NamingException e) {
-            throw new ServiceRuntimeException("Could not unbind service " + serviceClass);
+            throw new ServiceRuntimeException("Could not unbind service " + serviceClass.getName());
         }
     }
 

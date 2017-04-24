@@ -27,6 +27,10 @@
         <put-attribute name="title"  value="Registration"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/register.jsp"/>
     </definition>
+    <definition name="registerSuccess" extends="baseLayout">
+        <put-attribute name="title"  value="Registration"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/registerSuccess.jsp"/>
+    </definition>
 
     <definition name="loginError" extends="baseLayout">
         <put-attribute name="title"  value="Login"/>

@@ -32,9 +32,6 @@ public class ServiceInitializer implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
 
-        Services.unbind(OrderService.class);
-        Services.unbind(CustomerService.class);
-        Services.unbind(ProductService.class);
     }
 
 

@@ -25,12 +25,13 @@ public class RegisterAction extends ActionSupport implements RequestAware {
     private Map<String, Object> request;
 
     @Override
-    public String execute() throws Exception {
+    public String input() throws Exception {
 
-        //TODO validate data
-        if (customer.getUsername() == null) {
-            return SUCCESS;
-        }
+        return INPUT;
+    }
+
+    @Override
+    public String execute() throws Exception {
 
         try {
             service.createCustomer(this.customer);
@@ -39,9 +40,9 @@ public class RegisterAction extends ActionSupport implements RequestAware {
         } catch (ServiceException e) {
             request.put("result", e.getMessage());
             LOG.error("User registration failed", e);
+            return ERROR;
 
         }
-        //TODO use proper return forward to indicate error
         return SUCCESS;
     }
 

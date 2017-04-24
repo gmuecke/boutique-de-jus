@@ -290,7 +290,6 @@ public class BoutiqueDeJusWebServer {
         LOG.info("Sent stop");
         server.join();
         LOG.info("Server joined");
-
         LOG.info("Starting web server");
         server.setHandler(webApp);
         server.start();

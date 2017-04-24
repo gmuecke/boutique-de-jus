@@ -1,6 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-<s:form action="Register">
+
+<% if (request.getAttribute("result") != null) {%>
+    <span class="error"><%= request.getAttribute("result")%></span>
+<% } %>
+
+<s:form action="register_execute" validate="true">
     <s:textfield key="customer.lastname"/>
     <s:textfield key="customer.firstname"/>
     <s:textfield key="customer.email"/>
@@ -13,6 +18,4 @@
     <s:submit/>
 </s:form>
 
-<% if (request.getAttribute("result") != null) {%>
-<span><%= request.getAttribute("result")%></span>
-<% } %>
+

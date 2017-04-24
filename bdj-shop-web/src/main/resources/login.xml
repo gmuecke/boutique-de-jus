@@ -33,10 +33,11 @@
             </result>
         </action>
 
-        <action name="Register" class="io.bdj.webshop.actions.RegisterAction">
-            <result name="success" type="tiles">register</result>
-            <result name="userexists" type="tiles">register</result>
+        <action name="register_*" method="{1}" class="io.bdj.webshop.actions.RegisterAction">
+            <result name="input" type="tiles">register</result>
             <result name="error" type="tiles">register</result>
+            <result name="success" type="tiles">registerSuccess</result>
+            <allowed-methods>input,execute</allowed-methods>
         </action>
     </package>
 </struts>
