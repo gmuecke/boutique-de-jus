@@ -16,6 +16,9 @@
     </li>
     <% if (username != null) { %>
     <li style="float:right">
+        <a href="<s:url action="UserProfile_input" namespace="/secure"/>">UserProfile</a><br>
+    </li>
+    <li style="float:right">
         <a href="<s:url action="Logout" namespace="/"/>">Logout</a><br>
     </li>
     <%} else { %>

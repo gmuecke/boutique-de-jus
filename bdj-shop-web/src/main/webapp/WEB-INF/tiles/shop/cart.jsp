@@ -1,7 +1,9 @@
 <%@taglib uri="/struts-tags" prefix="s" %>
 
 <h1>Your shopping cart</h1>
-
+<% if (request.getAttribute("message") != null) {%>
+<span class="error"><%= request.getAttribute("message")%></span>
+<% } %>
 <table>
     <thead>
         <tr>
@@ -32,4 +34,4 @@
     </tfoot>
 </table>
 
-<a href="<s:url action="order_show" namespace="/secure"/>" >Submit Order</a><br>
+<a href="<s:url action="order_input" namespace="/secure"/>" >Submit Order</a><br>

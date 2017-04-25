@@ -5,13 +5,13 @@
 <validators>
   <field name="username">
     <field-validator type="requiredstring">
-      <message key="requiredstring"/>
+      <message key="login.errmsg.username"/>
     </field-validator>
   </field>
   
   <field name="password">
     <field-validator type="requiredstring">
-      <message key="requiredstring"/>
+      <message key="login.errmsg.password"/>
     </field-validator>
   </field>
 </validators>

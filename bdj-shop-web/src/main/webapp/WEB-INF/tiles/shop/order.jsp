@@ -3,6 +3,7 @@
 <h1>Confirm your order</h1>
 
 <p>Ship to:</p>
+
 <ul>
     <li><s:label key="customer.lastname"/>, <s:label key="customer.firstname"/></li>
     <li>
@@ -45,6 +46,6 @@
     </tr>
     </tfoot>
 </table>
-<s:form action="order_submit" namespace="/secure">
+<s:form action="order_execute" namespace="/secure">
     <s:submit key="order" />
 </s:form>

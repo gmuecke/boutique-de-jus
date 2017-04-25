@@ -1,7 +1,11 @@
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <h1>UserProfile</h1>
 
-<s:form action="UserProfile_save">
+<% if (request.getAttribute("message") != null) {%>
+<span class="error"><%= request.getAttribute("message")%></span>
+<% } %>
+
+<s:form action="UserProfile_execute">
     <s:label key="customer.username"/>
     <s:textfield key="customer.lastname"/>
     <s:textfield key="customer.firstname"/>

@@ -13,37 +13,37 @@ import io.bdj.service.OrderService;
 import io.bdj.service.ProductService;
 import io.bdj.service.Services;
 import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.interceptor.RequestAware;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
  *
  */
-public class OrderAction extends ActionSupport implements SessionAware {
+public class OrderAction extends ActionSupport implements SessionAware, RequestAware {
 
     private ProductService productService = Services.getService(ProductService.class);
     private OrderService orderService = Services.getService(OrderService.class);
     private CustomerService customerService = Services.getService(CustomerService.class);
     private Map<String, Object> session;
+    private Map<String, Object> request;
     private Map<Product, Integer> cart = new HashMap<>();
     private Double total;
     private Customer customer;
 
-    public String submit() throws Exception {
+    @Override
+    public String execute() throws Exception {
         //load all data
-        show();
+        input();
 
         orderService.submitOrder(customer, cart, total);
 
         return SUCCESS;
     }
 
-    public String show() throws Exception {
+    @Override
+    public String input() throws Exception {
 
         Cart sessionCart = (Cart) session.get("cart");
-        if (sessionCart == null) {
-            //TODO display cart is empty something message
-            return SUCCESS;
-        }
 
         final String currentUser = ServletActionContext.getRequest().getRemoteUser();
         this.customer = this.customerService.getCustomerByUserId(currentUser);
@@ -79,5 +79,10 @@ public class OrderAction extends ActionSupport implements SessionAware {
     public Double getTotal() {
 
         return total;
+    }
+
+    @Override
+    public void setRequest(final Map<String, Object> request) {
+        this.request = request;
     }
 }

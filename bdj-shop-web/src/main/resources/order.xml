@@ -12,7 +12,7 @@
         <action name="order_*" method="{1}" class="io.bdj.webshop.actions.OrderAction">
             <result type="tiles" name="input">order</result>
             <result type="tiles" name="success">orderSuccess</result>
-            <allowed-methods>show,submit</allowed-methods>
+            <allowed-methods>input,execute</allowed-methods>
         </action>
 
     </package>

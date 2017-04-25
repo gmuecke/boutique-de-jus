@@ -26,26 +26,26 @@ public class UserProfileAction extends ActionSupport implements RequestAware {
     private Customer customer;
 
     @Override
-    public String execute() throws Exception {
+    public String input() throws Exception {
 
         final String currentUser = ServletActionContext.getRequest().getRemoteUser();
 
         this.customer = this.service.getCustomerByUserId(currentUser);
 
-        return SUCCESS;
+        return INPUT;
     }
 
-    public String save() throws Exception {
+    public String execute() throws Exception {
 
         final String currentUser = ServletActionContext.getRequest().getRemoteUser();
         this.customer.setUsername(currentUser);
 
         try {
             this.service.updateCustomer(this.customer);
-            request.put("result", "User Updated");
+            request.put("message", "User Updated");
         } catch (ServiceException e) {
             LOG.error("User registration failed", e);
-            request.put("result", "Update failed");
+            request.put("message", "Update failed");
         }
         //TODO use proper result instead of message
         return SUCCESS;

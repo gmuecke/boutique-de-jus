@@ -15,18 +15,16 @@
                          class="io.bdj.webshop.interceptor.RunAsInterceptor"></interceptor>
         </interceptors>
         -->
-        <default-action-ref name="UserProfile"/>
+        <default-action-ref name="UserProfile_input"/>
         <global-results>
             <result name="login" type="redirect">/j_security_check.jsp</result>
         </global-results>
 
         <action name="UserProfile_*" method="{1}" class="io.bdj.webshop.actions.UserProfileAction">
              <!-- <interceptor-ref name="authentication"/> -->
-            <result type="tiles">userProfile</result>
-        </action>
-
-        <action name="UserProfileNoAuth" class="io.bdj.webshop.actions.UserProfileAction">
-            <result type="tiles">userProfile</result>
+            <result type="tiles" name="success">userProfile</result>
+            <result type="tiles" name="input">userProfile</result>
+            <allowed-methods>input,execute</allowed-methods>
         </action>
 
     </package>
