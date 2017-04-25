@@ -10,7 +10,6 @@
             <result-type name="imageResult" class="io.bdj.webshop.result.ImageResult"/>
         </result-types>
 
-
         <default-action-ref name="products_*"/>
 
         <action name="products_*" method="{1}" class="io.bdj.webshop.actions.ShopAction">
@@ -23,9 +22,9 @@
         </action>
 
         <action name="cart_*" method="{1}" class="io.bdj.webshop.actions.CartAction">
-            <result type="tiles">cart</result>
-            <result name="redirect" type="redirect">${url}</result>
-            <allowed-methods>add</allowed-methods>
+            <result type="tiles" name="success">cart</result>
+            <result type="redirect" name="input" >${url}</result>
+            <allowed-methods>add,execute</allowed-methods>
         </action>
     </package>
 

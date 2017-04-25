@@ -50,15 +50,13 @@ public class CartAction extends ActionSupport implements SessionAware {
         return SUCCESS;
     }
 
-
-
     public String add() throws Exception {
 
         session.putIfAbsent("cart", new Cart());
         Cart cart = (Cart) session.get("cart");
         cart.addProduct(id, quantity);
 
-        return "redirect";
+        return INPUT;
     }
 
     @Override

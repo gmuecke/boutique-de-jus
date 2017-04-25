@@ -17,9 +17,9 @@
             <td><s:property value="tags"/></td>
             <td><s:property value="price"/></td>
             <td>
-                <s:form action="cart_add">
-                    <s:hidden name="url" value="%{url}"/>
+                <s:form action="cart_add" validate="true">
                     <s:textfield name="quantity" key="quantity"/>
+                    <s:hidden name="url" value="%{url}"/>
                     <s:hidden name="id" value="%{id}"/>
                     <s:submit/>
                 </s:form>
