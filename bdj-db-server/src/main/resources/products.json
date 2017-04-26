@@ -48,6 +48,54 @@
     "price": 599.00
   },
   {
+    "name": "Fruit Press Pro",
+    "description": "Produce your own juice!",
+    "category": "Accessoires",
+    "tags": [
+      "juice",
+      "accessoire",
+      "press"
+    ],
+    "image": "/images/fruit_press.jpg",
+    "price": 5999.00
+  },
+  {
+    "name": "Juice glasses",
+    "description": "Drink your juice from the original juice glasses",
+    "category": "Accessoires",
+    "tags": [
+      "juice",
+      "accessoire",
+      "glas"
+    ],
+    "image": "/images/undefined.png",
+    "price": 399.00
+  },
+  {
+    "name": "Juice Gloves",
+    "description": "Real juice aficionados wear juice gloves",
+    "category": "Accessoires",
+    "tags": [
+      "juice",
+      "accessoire",
+      "gloves"
+    ],
+    "image": "/images/undefined.png",
+    "price": 29.00
+  },
+  {
+    "name": "Juice Bottles",
+    "description": "Fill your own juice bottles with fresh juice",
+    "category": "Accessoires",
+    "tags": [
+      "juice",
+      "accessoire",
+      "bottle"
+    ],
+    "image": "/images/undefined.png",
+    "price": 2.99
+  },
+  {
     "name": "Lemon Juice",
     "description": "Lemon Juice",
     "category": "Juice",
@@ -82,5 +130,181 @@
     ],
     "image": "/images/quince.jpg",
     "price": 4.25
+  },
+  {
+    "name": "Juice Pressing Course",
+    "description": "Learn how to press the juiciest juice for your own",
+    "category": "Course",
+    "tags": [
+      "juice",
+      "course"
+    ],
+    "image": "/images/undefined.png",
+    "price": 599
+  },
+  {
+    "name": "Juice Drinking Course",
+    "description": "Learn how to drink juice in the juiciest way",
+    "category": "Course",
+    "tags": [
+      "juice",
+      "course"
+    ],
+    "image": "/images/undefined.png",
+    "price": 499
+  },
+  {
+    "name": "Juice Sell Course",
+    "description": "Learn how to sell juice like a real businessman/woman",
+    "category": "Course",
+    "tags": [
+      "juice",
+      "course"
+    ],
+    "image": "/images/undefined.png",
+    "price": 899
+  },
+  {
+    "name": "Juice Consulting Course",
+    "description": "Learn how to consult other in the way of the juice ",
+    "category": "Course",
+    "tags": [
+      "juice",
+      "course"
+    ],
+    "image": "/images/undefined.png",
+    "price": 1599
+  },
+  {
+    "name": "Java Performance Testing Course",
+    "description": "Learn how to performance test Java applications, the rest is Juice",
+    "category": "Course",
+    "tags": [
+      "java",
+      "course"
+    ],
+    "image": "/images/DukeFriends.png",
+    "price": 2999
+  },
+  {
+    "name": "The Juice",
+    "description": "Thriller about juice",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "thriller"
+    ],
+    "image": "/images/undefined.png",
+    "price": 19
+  },
+  {
+    "name": "May the Juice be with you",
+    "description": "Juice Science Fiction saga",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "science-fiction"
+    ],
+    "image": "/images/undefined.png",
+    "price": 12.99
+  },
+  {
+    "name": "Juice Trek",
+    "description": "Juice in the 23rd century",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "science-fiction"
+    ],
+    "image": "/images/undefined.png",
+    "price": 17.99
+  },
+  {
+    "name": "Juice Park",
+    "description": "Fiction of pre-historic juice going wild",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "fiction"
+    ],
+    "image": "/images/undefined.png",
+    "price": 9.99
+  },
+  {
+    "name": "Fifty shades of juice",
+    "description": "Romantic novel about 50 ways to press your juice and other things",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "romance"
+    ],
+    "image": "/images/undefined.png",
+    "price": 22.99
+  },
+  {
+    "name": "Juicy Weapon",
+    "description": "Two Juice producers fighting against organized juice crime",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "thriller"
+    ],
+    "image": "/images/undefined.png",
+    "price": 15.50
+  },
+  {
+    "name": "The Juicinator",
+    "description": "Juice from the future tries to kill it's juice press",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "science-fiction"
+    ],
+    "image": "/images/undefined.png",
+    "price": 19.99
+  },
+  {
+    "name": "Mad Juice",
+    "description": "Fruit that lost its tree seeking revenge",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "science-fiction"
+    ],
+    "image": "/images/undefined.png",
+    "price": 18.99
+  },
+  {
+    "name": "Citizen Juice",
+    "description": "Story about the life of a juice",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "drama"
+    ],
+    "image": "/images/undefined.png",
+    "price": 18.25
+  },
+  {
+    "name": "Dr. Lovestrange or how I learned to love the juice",
+    "description": "Cold War Juice novel",
+    "category": "Books",
+    "tags": [
+      "juice",
+      "book",
+      "historic",
+      "fiction"
+    ],
+    "image": "/images/undefined.png",
+    "price": 25.99
   }
 ]

@@ -36,7 +36,7 @@ public class ProductInitializer {
                             + "DESCRIPTION VARCHAR(1024), "
                             + "CATEGORY VARCHAR (255), "
                             + "TAGS VARCHAR(255), "
-                            + "IMAGE BLOB(102400), "
+                            + "IMAGE BLOB(4194304), "
                             + "PRICE DECIMAL (8,2)"
                             + ")");
             conn.commit();

@@ -40,7 +40,7 @@ public class ShopAction extends ActionSupport implements SessionAware{
     }
     public String courses() throws Exception {
 
-        return queryProducts("Courses");
+        return queryProducts("Course");
     }
 
     public String queryProducts(String category) throws Exception {
