@@ -7,29 +7,29 @@
         <a href="<s:url action="index" namespace="/"/>">Home</a>
     </li>
     <% if (username != null) { %>
-    <li>
-        <span> Hello <%= username %>. This is a secure resource</span>
+    <li class="info">
+        <span id="loginInfo"> Logged in as <%= username %></span>
     </li>
     <%}%>
-    <li style="float:right">
+    <li class="floatRight">
         <a href="<s:url action="cart_" namespace="/"/>">Cart</a><br>
     </li>
     <% if (username != null) { %>
-    <li style="float:right">
+    <li class="floatRight">
         <a href="<s:url action="UserProfile_input" namespace="/secure"/>">UserProfile</a><br>
     </li>
-    <li style="float:right">
+    <li class="floatRight">
         <a href="<s:url action="Logout" namespace="/"/>">Logout</a><br>
     </li>
     <%} else { %>
-    <li style="float:right">
+    <li class="floatRight">
         <a href="<s:url action="register_input" namespace="/"/>">Register</a><br>
     </li>
-    <li style="float:right">
+    <li class="floatRight">
         <a href="<s:url action="Login" namespace="/"/>">Login</a><br>
     </li>
     <%}%>
-    <li style="float:right">
+    <li class="floatRight">
         <a href="<s:url action="help" namespace="/"/>">Help</a><br>
     </li>
 </ul>
