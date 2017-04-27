@@ -44,6 +44,10 @@ public class OrderAction extends ActionSupport implements SessionAware, RequestA
     public String input() throws Exception {
 
         Cart sessionCart = (Cart) session.get("cart");
+        if(sessionCart == null){
+            return INPUT;
+        }
+
 
         final String currentUser = ServletActionContext.getRequest().getRemoteUser();
         this.customer = this.customerService.getCustomerByUserId(currentUser);
