@@ -1,11 +1,12 @@
 <!DOCTYPE tiles-definitions PUBLIC
-        "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
-        "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
 
 <tiles-definitions>
 
     <definition name="baseLayout" template="/WEB-INF/tiles/layout.jsp">
-
+        <put-attribute name="title" value="DEFAULT_TITLE" cascade="true"/>
+        <put-attribute name="category" value="DEFAULT_CATEGORY" cascade="true" type="string"/>
         <put-attribute name="header" value="/WEB-INF/tiles/header.jsp"/>
         <put-attribute name="topmenu"   value="/WEB-INF/tiles/topmenu.jsp"/>
         <put-attribute name="menu"   value="/WEB-INF/tiles/menu.jsp"/>
@@ -14,63 +15,68 @@
     </definition>
 
     <definition name="home" extends="baseLayout">
-        <put-attribute name="title"  value="home"/>
+        <put-attribute name="title"  value="Home" cascade="true" />
         <put-attribute name="body"   value="/WEB-INF/tiles/home.jsp"/>
     </definition>
 
     <definition name="login" extends="baseLayout">
-        <put-attribute name="title"  value="Login"/>
+        <put-attribute name="title"  value="Login" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/login.jsp"/>
     </definition>
 
     <definition name="register" extends="baseLayout">
-        <put-attribute name="title"  value="Registration"/>
+        <put-attribute name="title"  value="Registration" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/register.jsp"/>
     </definition>
     <definition name="registerSuccess" extends="baseLayout">
-        <put-attribute name="title"  value="Registration"/>
+        <put-attribute name="title"  value="Registration" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/registerSuccess.jsp"/>
     </definition>
 
     <definition name="loginError" extends="baseLayout">
-        <put-attribute name="title"  value="Login"/>
+        <put-attribute name="title"  value="Login" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/loginError.jsp"/>
     </definition>
 
     <definition name="userProfile" extends="baseLayout" role="users">
-        <put-attribute name="title"  value="UserProfile"/>
+        <put-attribute name="title"  value="UserProfile" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/userprofile.jsp"/>
     </definition>
 
     <!-- Shop content-->
-    <definition name="juices" extends="baseLayout" >
-        <put-attribute name="title"  value="Juice Shop - Juices"/>
-        <put-attribute name="body"   value="/WEB-INF/tiles/shop/juices.jsp"/>
+    <definition name="products" extends="baseLayout" >
+        <put-attribute name="title" value="PRODUCT_DEFAULT_TITLE" cascade="true"/>
+        <put-attribute name="category" value="PRODUCT_DEFAULT_CATEGORY" cascade="true"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/shop/products.jsp"/>
     </definition>
-    <definition name="accessoires" extends="baseLayout" >
-        <put-attribute name="title"  value="Juice Shop - Accessoires"/>
-        <put-attribute name="body"   value="/WEB-INF/tiles/shop/accessoires.jsp"/>
+    <definition name="juices" extends="products" >
+        <put-attribute name="title"  value="Juice Shop - Juices" cascade="true"/>
+        <put-attribute name="category" value="Juice" cascade="true"/>
     </definition>
-    <definition name="books" extends="baseLayout" >
-        <put-attribute name="title"  value="Juice Shop - Books"/>
-        <put-attribute name="body"   value="/WEB-INF/tiles/shop/books.jsp"/>
+    <definition name="accessoires" extends="products" >
+        <put-attribute name="title"  value="Juice Shop - Accessoires" cascade="true"/>
+        <put-attribute name="category" value="Accessoires" cascade="true"/>
     </definition>
-    <definition name="courses" extends="baseLayout" >
-        <put-attribute name="title"  value="Juice Shop - Courses"/>
-        <put-attribute name="body"   value="/WEB-INF/tiles/shop/courses.jsp"/>
+    <definition name="books" extends="products" >
+        <put-attribute name="title"  value="Juice Shop - Books" cascade="true"/>
+        <put-attribute name="category" value="Books" cascade="true"/>
+    </definition>
+    <definition name="courses" extends="products" >
+        <put-attribute name="title"  value="Juice Shop - Courses" cascade="true"/>
+        <put-attribute name="category" value="Course" cascade="true"/>
     </definition>
 
     <!-- order process -->
     <definition name="cart" extends="baseLayout" >
-        <put-attribute name="title"  value="Shopping cart"/>
+        <put-attribute name="title"  value="Shopping cart" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/shop/cart.jsp"/>
     </definition>
     <definition name="order" extends="baseLayout" >
-        <put-attribute name="title"  value="Order Confirmation"/>
+        <put-attribute name="title"  value="Order Confirmation" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/shop/order.jsp"/>
     </definition>
     <definition name="orderSuccess" extends="baseLayout" >
-        <put-attribute name="title"  value="Order Success"/>
+        <put-attribute name="title"  value="Order Success" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/shop/orderSuccess.jsp"/>
     </definition>
 </tiles-definitions>

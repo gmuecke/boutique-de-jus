@@ -1,8 +1,9 @@
 <%@taglib uri="/struts-tags" prefix="s" %>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 
-<h1>Juice Course Catalog</h1>
+<h1>Juicy  <tiles:getAsString name="category" ignore="true" /></h1>
 
-<table>
+<table id="products">
     <s:iterator value="products">
         <tr>
             <td><s:property value="id"/></td>

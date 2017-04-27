@@ -21,7 +21,7 @@
                 <tiles:insertAttribute name="header"/>
             </header>
             <main id="main" class="main">
-                <tiles:insertAttribute name="body"/>
+                <tiles:insertAttribute name="body" />
             </main>
             <footer>
                 <tiles:insertAttribute name="footer"/>
