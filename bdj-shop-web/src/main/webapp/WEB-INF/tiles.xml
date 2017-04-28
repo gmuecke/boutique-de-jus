@@ -23,6 +23,10 @@
         <put-attribute name="title"  value="Login" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/login.jsp"/>
     </definition>
+    <definition name="loginError" extends="baseLayout">
+        <put-attribute name="title"  value="Login" cascade="true"/>
+        <put-attribute name="body"   value="/WEB-INF/tiles/loginError.jsp"/>
+    </definition>
 
     <definition name="register" extends="baseLayout">
         <put-attribute name="title"  value="Registration" cascade="true"/>
@@ -31,11 +35,6 @@
     <definition name="registerSuccess" extends="baseLayout">
         <put-attribute name="title"  value="Registration" cascade="true"/>
         <put-attribute name="body"   value="/WEB-INF/tiles/registerSuccess.jsp"/>
-    </definition>
-
-    <definition name="loginError" extends="baseLayout">
-        <put-attribute name="title"  value="Login" cascade="true"/>
-        <put-attribute name="body"   value="/WEB-INF/tiles/loginError.jsp"/>
     </definition>
 
     <definition name="userProfile" extends="baseLayout" role="users">
@@ -53,7 +52,7 @@
         <put-attribute name="title"  value="Juice Shop - Juices" cascade="true"/>
         <put-attribute name="category" value="Juice" cascade="true"/>
     </definition>
-    <definition name="accessoires" extends="products" >
+    <definition name="accessories" extends="products" >
         <put-attribute name="title"  value="Juice Shop - Accessoires" cascade="true"/>
         <put-attribute name="category" value="Accessoires" cascade="true"/>
     </definition>

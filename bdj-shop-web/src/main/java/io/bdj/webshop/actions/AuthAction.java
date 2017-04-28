@@ -73,7 +73,12 @@ public class AuthAction extends ActionSupport {
         final HttpSession session = request.getSession();
 
         //perform container login
-        request.login(username, password);
+        try {
+            request.login(username, password);
+        } catch(ServletException e){
+            LOG.error("Login failed", e);
+            return Action.ERROR;
+        }
 
         //try to obtain the Subject from the container or perform an _additional_ login
         //in order to get the subject.

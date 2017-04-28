@@ -1,6 +1,6 @@
 body {
-    background: white;
-    font-family: Arial, sans-serif;
+    background-color: lightyellow;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
     margin: 0;
 }
 
@@ -114,7 +114,6 @@ main {
     margin-left: 150px;
     padding: 20px !important;
     text-align: left;
-    background-color: lightyellow;
 }
 
 main h1 {
@@ -135,6 +134,9 @@ main h1 {
 }
 
 footer {
+    bottom: 0px;
+    position: fixed;
+    width: 100%;
     background: yellowgreen;
     margin-left: 150px;
     color: black;
