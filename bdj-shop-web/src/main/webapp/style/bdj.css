@@ -77,36 +77,65 @@ nav.side {
     left: 0;
     width: 150px;
     height: 100%;
-    background: lightsteelblue;
+    background: yellowgreen;
     z-index: 255;
 }
 nav.side ul {
     list-style-type: none;
     padding: 0;
+    margin-top: 150px;
 }
 
 nav.side ul a {
     text-decoration: none;
 }
+nav.side li {
+    border-radius: 25px;
+    border: 1px solid darkolivegreen;
+    padding: 5px;
+    margin: 5px;
+    color: black;
+}
+nav.side li:hover {
+    background-color: lightyellow;
+}
 
 /* The main area */
 header {
     margin-top: 50px;
-    height: 100px;
+    height: 150px;
     width: 100%;
     vertical-align: middle;
     text-align: center;
-    background: steelblue;
+    background: yellowgreen;
     color: black;
 }
 main {
     margin-left: 150px;
-    padding: 15px;
+    padding: 20px !important;
     text-align: left;
+    background-color: lightyellow;
+}
+
+main h1 {
+    padding-left: 100px;
+}
+
+#products img {
+    width: 100px;
+}
+
+.product_id,
+.product_cat,
+.product_tags {
+    display:none;
+}
+.product_add table * {
+    display: inline;
 }
 
 footer {
-    background: lightsteelblue;
+    background: yellowgreen;
     margin-left: 150px;
     color: black;
 }
