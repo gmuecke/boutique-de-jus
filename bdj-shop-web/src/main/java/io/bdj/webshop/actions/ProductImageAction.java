@@ -27,7 +27,12 @@ public class ProductImageAction extends ActionSupport implements ServletRequestA
     @Override
     public String execute() throws ServiceException {
 
-        this.imageInByte = productService.getImageData(id);
+        try{
+            this.imageInByte = productService.getImageData(id);
+        } catch (Exception e){
+            LOG.error("Could not fetch image", e);
+            return ERROR;
+        }
 
         return SUCCESS;
     }

@@ -18,7 +18,8 @@
         </action>
 
         <action name="productImage" class="io.bdj.webshop.actions.ProductImageAction">
-            <result name="success" type="imageResult"/>
+            <result name="success" type="imageResult" />
+            <result name="error" type="httpheader">500</result>
         </action>
 
         <action name="cart_*" method="{1}" class="io.bdj.webshop.actions.CartAction">

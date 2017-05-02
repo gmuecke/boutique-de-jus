@@ -1,7 +1,5 @@
 package io.bdj.webshop.actions;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,14 +10,11 @@ import io.bdj.model.Product;
 import io.bdj.service.ProductService;
 import io.bdj.service.Services;
 import org.apache.struts2.interceptor.SessionAware;
-import org.slf4j.Logger;
 
 /**
  *
  */
 public class CartAction extends ActionSupport implements SessionAware {
-
-    private static final Logger LOG = getLogger(CartAction.class);
 
     private ProductService productService = Services.getService(ProductService.class);
 
@@ -41,7 +36,8 @@ public class CartAction extends ActionSupport implements SessionAware {
         }
         this.cart.putAll(sessionCart.getProducts()
                                     .stream()
-                                    .collect(Collectors.toMap(productService::readProduct, Cart.CartEntry::getQuantity)));
+                                    .collect(Collectors.toMap(productService::readProduct,
+                                                              Cart.CartEntry::getQuantity)));
 
         this.total = this.cart.entrySet()
                               .stream()
