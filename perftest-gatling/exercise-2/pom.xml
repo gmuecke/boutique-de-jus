@@ -11,5 +11,25 @@
 
     <artifactId>exercise-2</artifactId>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.gatling</groupId>
+                <artifactId>gatling-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>simple</id>
+                        <phase/>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <sc>workshop.AnonymousVisitSimulation</sc>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

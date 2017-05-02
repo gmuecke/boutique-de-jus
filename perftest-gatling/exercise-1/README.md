@@ -12,6 +12,9 @@ Setup
 - Install IntelliJ Scala Support
 - Import this module
 
+IntelliJ:
+ - Add Framework Support... > Scala 
+
 Optional: Download Gatling
 
 Record
