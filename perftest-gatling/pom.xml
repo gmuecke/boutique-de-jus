@@ -10,7 +10,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>perftest-gatling</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>exercise-1</module>
+        <module>exercise-2</module>
+        <module>exercise-3</module>
+    </modules>
+
     <properties>
+        <!--
+            Define the version for gatling and the gatling maven plugin centrally here for all exercises.
+            To use a different plugin version, simply set a different property in the child module.
+        -->
         <gatling.version>2.2.2</gatling.version>
         <gatling-plugin.version>2.2.3</gatling-plugin.version>
     </properties>
@@ -24,46 +36,37 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.gatling</groupId>
+                    <artifactId>gatling-maven-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <skipMain>true</skipMain> <!-- skip compile -->
-                    <skip>true</skip> <!-- skip testCompile -->
+                    <skipMain>true</skipMain>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>com.google.code.sbt-compiler-maven-plugin</groupId>
                 <artifactId>sbt-compiler-maven-plugin</artifactId>
-                <version>1.0.0-beta8</version>
+                <version>1.0.0-rc1</version>
                 <executions>
                     <execution>
                         <id>default-sbt-compile</id>
                         <goals>
-                            <goal>addScalaSources</goal> <!-- short equivalent of the more verbose version below -->
+                            <goal>addScalaSources</goal>
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>io.gatling</groupId>
-                <artifactId>gatling-maven-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>simple</id>
-                        <phase/>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <sc>io.bdj.perftest.SimpleSimulation</sc>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
