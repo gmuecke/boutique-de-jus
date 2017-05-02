@@ -52,7 +52,7 @@
         <put-attribute name="title"  value="Juice Shop - Juices" cascade="true"/>
         <put-attribute name="category" value="Juice" cascade="true"/>
     </definition>
-    <definition name="accessories" extends="products" >
+    <definition name="accessoires" extends="products" >
         <put-attribute name="title"  value="Juice Shop - Accessoires" cascade="true"/>
         <put-attribute name="category" value="Accessoires" cascade="true"/>
     </definition>

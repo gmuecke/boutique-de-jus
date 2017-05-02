@@ -198,7 +198,9 @@ public class BoutiqueDeJusWebServer {
             System.setProperty("jetty.base", ".");
 
             JAASLoginService loginService = new JAASLoginService();
-            System.setProperty("java.security.auth.login.config", "bdj-web-server/login.conf");
+            if(System.getProperty("java.security.auth.login.config") == null){
+                System.setProperty("java.security.auth.login.config", "bdj-web-server/login.conf");
+            }
             //TODO change to DB login
             loginService.setName("BoutiqueDeJusRealm");
 //            loginService.setLoginModuleName("PropertyFile");

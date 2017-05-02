@@ -44,7 +44,30 @@
 
     <build>
         <plugins>
-            <!--
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <!-- optional -->
+                    <workingDirectory>${project.basedir}</workingDirectory>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-cp</argument>
+                        <classpath/>
+                        <argument>io.bdj.BoutiqueDeJusBootstrap</argument>
+                    </arguments>
+                    <classPathScope>runtime</classPathScope>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -73,7 +96,6 @@
                     <overWriteSnapshots>true</overWriteSnapshots>
                 </configuration>
             </plugin>
-            -->
         </plugins>
     </build>
 

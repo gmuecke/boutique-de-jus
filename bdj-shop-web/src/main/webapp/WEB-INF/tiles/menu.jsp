@@ -5,7 +5,7 @@
         <a href="<s:url action="products_juices" namespace="/"/>" >Juices</a><br>
     </li>
     <li>
-        <a href="<s:url action="products_accessories" namespace="/"/>" >Accessoires</a><br>
+        <a href="<s:url action="products_accessoires" namespace="/"/>">Accessoires</a><br>
     </li>
     <li>
         <a href="<s:url action="products_books" namespace="/"/>" >Books</a><br>
