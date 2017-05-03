@@ -11,7 +11,7 @@ import workshop.Headers.{acceptCss, acceptImage, defaultHeader}
 package object pages {
 
   private def image(id: String) = http(s"image $id").get(s"/productImage.action?id=$id").headers(acceptImage)
-  private def images(id: String*)  = id.map(i => image(i)) to: _*
+  private def images(id: String*) = id.map(i => image(i))
 
   val WelcomePage = group("Welcome Page") {
     exec(http("/")
@@ -44,9 +44,7 @@ package object pages {
       http("/products_books.action")
       .get("/products_books.action")
       .headers(defaultHeader)
-      .resources(
-        images("7", "8", "9", "10", "11", "12")
-      ))
+      .resources(images("7", "8", "9", "10", "11", "12"):_*))
   }
 
   val CoursesPage = group("Courses Page") {
