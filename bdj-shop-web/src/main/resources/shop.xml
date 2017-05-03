@@ -7,7 +7,8 @@
 
         <result-types>
             <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult"/>
-            <result-type name="imageResult" class="io.bdj.webshop.result.ImageResult"/>
+            <result-type name="image" class="io.bdj.webshop.result.ImageResult"/>
+            <result-type name="error" class="io.bdj.webshop.result.ErrorResult"/>
         </result-types>
 
         <default-action-ref name="products_*"/>
@@ -18,8 +19,11 @@
         </action>
 
         <action name="productImage" class="io.bdj.webshop.actions.ProductImageAction">
-            <result name="success" type="imageResult" />
-            <result name="error" type="httpheader">500</result>
+            <result name="success" type="image" />
+            <result name="error" type="error">
+                <param name="statusCode">500</param>
+                <param name="message">Could not fetch image</param>
+            </result>
         </action>
 
         <action name="cart_*" method="{1}" class="io.bdj.webshop.actions.CartAction">
@@ -28,6 +32,5 @@
             <allowed-methods>add,execute</allowed-methods>
         </action>
     </package>
-
 
 </struts>
