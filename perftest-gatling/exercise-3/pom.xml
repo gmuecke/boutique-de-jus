@@ -12,4 +12,25 @@
     <artifactId>exercise-3</artifactId>
 
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.gatling</groupId>
+                <artifactId>gatling-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>webshop</id>
+                        <phase/>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <sc>workshop.WebShopSimulation</sc>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

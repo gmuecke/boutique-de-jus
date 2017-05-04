@@ -11,7 +11,7 @@ import io.bdj.service.ProductService;
 import io.bdj.service.Services;
 import io.bdj.service.impl.DirectConnectJdbcCustomerService;
 import io.bdj.service.impl.DirectConnectJdbcProductService;
-import io.bdj.service.impl.PrintOrderService;
+import io.bdj.service.impl.QueuedPrintOrderService;
 import org.slf4j.Logger;
 
 /**
@@ -24,7 +24,7 @@ public class ServiceInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
-        Services.bind(OrderService.class, new PrintOrderService());
+        Services.bind(OrderService.class, new QueuedPrintOrderService());
         Services.bind(CustomerService.class, new DirectConnectJdbcCustomerService());
         Services.bind(ProductService.class, new DirectConnectJdbcProductService());
     }

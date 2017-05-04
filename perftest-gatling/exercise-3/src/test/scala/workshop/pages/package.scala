@@ -133,7 +133,7 @@ package object pages {
     exec(http("/cart_add.action (post)")
       .post("/cart_add.action")
       .headers(formHeader)
-      .formParam("url", page.get)
+      .formParam("url", page.url)
       .formParam("quantity", quantity)
       .formParam("id", productId))
   }

@@ -35,11 +35,9 @@ package object scenarios {
       exec(ShowCart(products: _*)).exec(ShowOrderSummary(products: _*)).exec(SubmitOrder)
     }
 
-    def shopProducts(username: String, password: String, products: String*) = group("Shopping") {
+    def shopProducts(username: String, password: String)(products: String*) = group("Shopping") {
       exec(chains.login(username, password))
-        .exec(
-          feed(products.map(i => Map("productId" -> s"$i")).toArray)
-            .exec(chains.orderProduct("${productId}")))
+        .exec(products.map(id => chains.orderProduct(id)).toArray)
         .exec(chains.checkout(products: _*))
         .exec(chains.logout)
     }
@@ -49,7 +47,7 @@ package object scenarios {
     .exec(chains.welcome)
     .randomSwitch(
       0.80 -> chains.anonymousBrowsing,
-      0.20 -> chains.shopProducts("test","test", "1", "4", "16", "16")
+      0.20 -> chains.shopProducts("test","test")("1", "4", "16", "16")
     )
 
   val onlyBrowsing = scenario("Only Browser")
@@ -58,7 +56,7 @@ package object scenarios {
 
   val onlyShopping = scenario("Only Shopping")
     .exec(chains.welcome)
-    .exec(chains.shopProducts("test","test", "1", "4", "16", "6"))
+    .exec(chains.shopProducts("test","test")("1", "4", "16", "6"))
 
 
 }
