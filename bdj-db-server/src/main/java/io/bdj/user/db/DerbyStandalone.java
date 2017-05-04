@@ -8,8 +8,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import io.bdj.util.signals.Payloads;
 import io.bdj.util.signals.Signal;
 import io.bdj.util.signals.SignalTransceiver;
 import org.apache.derby.drda.NetworkServerControl;
@@ -28,9 +30,12 @@ public class DerbyStandalone {
         System.setProperty("derby.user.admin", "admin");
 
         NetworkServerControl server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-        server.start(new PrintWriter(System.out));
-        server.setTimeSlice(5);
-        server.setMaxThreads(10);
+        final PrintWriter out = new PrintWriter(System.out);
+        server.start(out);
+
+
+        server.setTimeSlice(Integer.getInteger("db.timeslice", 5));
+        server.setMaxThreads(Integer.getInteger("db.threads", 10));
 
         try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/testdb;create=true");
              Statement statement = conn.createStatement()) {
@@ -73,7 +78,43 @@ public class DerbyStandalone {
         final int stopPort = Integer.parseInt(System.getProperty("bdj.db.signalPort", "11009"));
         SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.SHUTDOWN, e -> {
             LOG.info("Received stop signal from " + e.getReplyAddr());
-            fut.complete(e);
+            try {
+                server.shutdown();
+            } catch (Exception e1) {
+                LOG.log(Level.SEVERE, e1, () -> "Server Shutdown failed");
+            } finally {
+                fut.complete(e);
+            }
+        }).onReceive(Signal.RESTART, e -> {
+            LOG.info("Restarting Server");
+            try {
+                server.shutdown();
+                server.start(out);
+                com.send(Signal.OK, e.getReplyAddr());
+            } catch (Exception e1) {
+                LOG.log(Level.SEVERE, e1, () -> "Restart failed, stopping server");
+                fut.complete(e);
+            }
+        }).onReceive(Signal.SET, e -> {
+            LOG.info("Reconfiguring server: " + e);
+            String[] nameValuePair = Payloads.nameValuePair(e.getPayload());
+            switch(nameValuePair[0]){
+                case "threads":
+                    try {
+                        server.setMaxThreads(Integer.valueOf(nameValuePair[1]));
+                    } catch (Exception e1) {
+                        LOG.log(Level.SEVERE, e1, () -> "Failed to change Threads to " + nameValuePair[1]);
+                    }
+                    break;
+                case "tslice":
+                    try {
+                        server.setTimeSlice(Integer.valueOf(nameValuePair[1]));
+                    } catch (Exception e1) {
+                        LOG.log(Level.SEVERE, e1, () -> "Failed to change TimeSlice to " + nameValuePair[1]);
+                    }
+                    break;
+            }
+
         }));
 
     }

@@ -42,6 +42,11 @@ public enum Signal {
      * Sends a restart signal
      */
     RESTART(new byte[]{0x52, 0x53}),
+
+    /**
+     * Set a value on the server
+     */
+    SET(new byte[]{0x53,0x56})
     ;
 
     private static final Logger LOG = getLogger(Signal.class.getName());

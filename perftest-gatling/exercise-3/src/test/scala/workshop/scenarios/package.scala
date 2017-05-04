@@ -20,7 +20,7 @@ package object scenarios {
     def welcome = exec(WelcomePage)
 
     def anonymousBrowsing = group("Anonymous Browsing") {
-        .exec(JuicesPage)
+        exec(JuicesPage)
         .exec(BooksPage)
         .exec(AccessoiresPage)
         .exec(CoursesPage)
