@@ -18,26 +18,29 @@ import io.bdj.service.OrderService;
  */
 public class QueuedPrintOrderService implements OrderService {
 
+    //TODO PERF limit queue size (parameter)
+    private static final int PRINTER_COUNT = 1;
+    //TODO PERF make job size parameterizable
+    private static final int PRINT_JOBSIZE = 256 * 1024;
+    //TODO PERF make print duration parametrizable
+    private static final int PRINT_TIME_SECONDS = 60;
+
     //we have only 1 printer
     //TODO PERF make number of printers configurable
-    private static final ScheduledExecutorService SPOOLER = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService SPOOLER = Executors.newScheduledThreadPool(PRINTER_COUNT);
 
-    //TODO PERF limit queue size (parameter)
     private final Deque<byte[]> printQueue = new ConcurrentLinkedDeque<>();
 
     public void submitOrder(final Customer customer, final Map<Product, Integer> cart, final Double total) {
 
-        //TODO PERF make job size parameterizable
-        byte[] printJob = new byte[65536];
+        byte[] printJob = new byte[PRINT_JOBSIZE];
         int offset = 0;
         offset = addToJob(customer, printJob, offset);
         offset = addToJob(cart, printJob, offset);
         addToJob(total, printJob, offset);
         printQueue.push(printJob);
 
-        SPOOLER.schedule(() -> {
-            print(printQueue.pop());
-        }, 5, TimeUnit.SECONDS);
+        SPOOLER.schedule(() -> print(printQueue.pop()), 5, TimeUnit.SECONDS);
     }
 
     /**
@@ -46,8 +49,7 @@ public class QueuedPrintOrderService implements OrderService {
      */
     private void print(final byte[] pop) {
         try {
-            //TODO PERF make print duration parametrizable
-            Thread.sleep(30_000); //30 seconds per page
+            Thread.sleep(PRINT_TIME_SECONDS * 1000);
         } catch (InterruptedException e) {
             //ignore
         }

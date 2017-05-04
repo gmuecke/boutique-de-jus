@@ -91,6 +91,9 @@ public class WebServerController extends ProcessController {
                 + "\""
                 + (debugMode.isSelected() ? " -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + debugPort.getValue() : "")
                 + " -Djava.security.auth.login.config=login.conf"
+                //TODO make memory params configurable
+                + " -Xms128m"
+                + " -Xmx768m"
                 + " io.bdj.web.BoutiqueDeJusWebServer -w "+warChooser.getValue()
                 + " -p " + httpPort.getValue()
                 + " -tpmn " + minThreads.getValue()

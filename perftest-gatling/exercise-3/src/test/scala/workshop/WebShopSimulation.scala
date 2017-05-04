@@ -21,8 +21,8 @@ class WebShopSimulation extends Simulation{
 
   setUp(
     scenarios.mostBrowseSomeShop8020.inject(
-      rampUsersPerSec(0.5) to (10) during (2 minutes),
-      constantUsersPerSec(10) during (3 minutes)
+      rampUsersPerSec(1) to (50) during (5 minutes),
+      constantUsersPerSec(50) during (10 minutes)
     )
   ).protocols(httpProtocol)
 
