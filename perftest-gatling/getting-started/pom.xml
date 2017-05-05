@@ -2,22 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>boutique-de-jus</artifactId>
-        <groupId>io.bdj</groupId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>perftest-gatling</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>exercise-1</module>
-        <module>exercise-2</module>
-        <module>exercise-3</module>
-        <module>getting-started</module>
-    </modules>
+    <artifactId>getting-started</artifactId>
+    <groupId>io.bdj</groupId>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This is an empty template with pre-configured maven pom to start recording gatling right away.
+    </description>
 
     <properties>
         <!--
@@ -38,13 +30,6 @@
 
     <build>
         <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>io.gatling</groupId>
-                    <artifactId>gatling-maven-plugin</artifactId>
-                    <version>${gatling-plugin.version}</version>
-                </plugin>
-            </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
@@ -71,6 +56,23 @@
                     </execution>
                 </executions>
             </plugin>
+                <plugin>
+                    <groupId>io.gatling</groupId>
+                    <artifactId>gatling-maven-plugin</artifactId>
+                    <version>${gatling-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>simple</id>
+                            <phase/>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <configuration>
+                                <sc>workshop.RecordedSimulation</sc>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
         </plugins>
     </build>
 

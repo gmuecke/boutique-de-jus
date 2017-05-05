@@ -3,8 +3,6 @@ package workshop
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
-import io.gatling.http.request.builder.HttpRequestBuilder
-import workshop.Headers._
 
 /**
   * List of Pages of the WebShop
@@ -12,7 +10,10 @@ import workshop.Headers._
 package object pages {
 
   /**
-    * Shop pages that might be directly accessed
+    * Shop pages that might be directly accessed. These pages are only required for the addToCart action where
+    * the user will be redirected to the same page after the items have been added. The redirection url
+    * is passed to the action as an URL (the first parameter of the page). For the load simulation, the
+    * result is to
     */
   object ShopPages extends Enumeration {
     class Page(val url:String, val chains: ChainBuilder*)
@@ -20,6 +21,43 @@ package object pages {
     val Accessoires = new Page("http://localhost:8080/products_accessoires.action", pages.AccessoiresPage)
     val Books = new Page("http://localhost:8080/products_books.action", pages.BooksPage)
     val Courses = new Page("http://localhost:8080/products_courses.action", pages.CoursesPage)
+  }
+
+  /**
+    * Headers used in the requests
+    */
+  object Headers {
+    val defaultHeader = Map(
+      "Accept" -> "*/*",
+      "Accept-Encoding" -> "gzip, deflate",
+      "Accept-Language" -> "en-US,de;q=0.7,en;q=0.3",
+      "Connection" -> "keep-alive",
+      "Pragma" -> "no-cache",
+      "User-Agent" -> "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0")
+
+    val acceptCss = Map("Accept" -> "text/css,*/*;q=0.1")
+
+    val acceptImage = Map("Accept" -> "image/webp,image/*,*/*;q=0.8")
+
+    val formHeader = Map(
+      "Accept-Encoding" -> "gzip, deflate, br")
+  }
+
+  object Headers {
+    val defaultHeader = Map(
+      "Accept" -> "*/*",
+      "Accept-Encoding" -> "gzip, deflate",
+      "Accept-Language" -> "en-US,de;q=0.7,en;q=0.3",
+      "Connection" -> "keep-alive",
+      "Pragma" -> "no-cache",
+      "User-Agent" -> "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0")
+
+    val acceptCss = Map("Accept" -> "text/css,*/*;q=0.1")
+
+    val acceptImage = Map("Accept" -> "image/webp,image/*,*/*;q=0.8")
+
+    val formHeader = Map(
+      "Accept-Encoding" -> "gzip, deflate, br")
   }
 
   /**

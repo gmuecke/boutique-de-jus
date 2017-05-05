@@ -21,7 +21,7 @@ public class QueuedPrintOrderService implements OrderService {
     //TODO PERF limit queue size (parameter)
     private static final int PRINTER_COUNT = 1;
     //TODO PERF make job size parameterizable
-    private static final int PRINT_JOBSIZE = 256 * 1024;
+    private static final int PRINT_JOBSIZE = 1024 * 1024;
     //TODO PERF make print duration parametrizable
     private static final int PRINT_TIME_SECONDS = 60;
 
