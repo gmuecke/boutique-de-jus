@@ -19,11 +19,11 @@ import io.bdj.service.OrderService;
 public class QueuedPrintOrderService implements OrderService {
 
     //TODO PERF limit queue size (parameter)
-    private static final int PRINTER_COUNT = 1;
+    private static final int PRINTER_COUNT = Integer.getInteger("bdj.qpos.count",1);
     //TODO PERF make job size parameterizable
-    private static final int PRINT_JOBSIZE = 1024 * 1024;
+    private static final int PRINT_JOBSIZE = Integer.getInteger("bdj.qpos.jobSize", 1024);
     //TODO PERF make print duration parametrizable
-    private static final int PRINT_TIME_SECONDS = 60;
+    private static final int PRINT_TIME_SECONDS = Integer.getInteger("bdj.qpos.printTimeS", 60);
 
     //we have only 1 printer
     //TODO PERF make number of printers configurable

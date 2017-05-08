@@ -46,6 +46,14 @@ public class WebServerController extends ProcessController {
     public ChoiceBox<String> xmxUnit;
     @FXML
     public ChoiceBox<String> xmsUnit;
+    @FXML
+    public Spinner<Integer> printerCount;
+    @FXML
+    public ChoiceBox<String> printJobSizeUnit;
+    @FXML
+    public Spinner<Integer> printJobSize;
+    @FXML
+    public Spinner<Integer> printerDuration;
 
     private SocketAddress addr = new InetSocketAddress(localhost, 11008);
 
@@ -53,7 +61,6 @@ public class WebServerController extends ProcessController {
 
         updateProcessStatus(ProcessStatus.RESTARTING);
         com().send(Signal.RESTART, getServiceAddress());
-
     }
 
     @Override
@@ -84,10 +91,15 @@ public class WebServerController extends ProcessController {
         SpinnerUtil.initializeSpinner(maxThreads, 10, 65535, 80);
         SpinnerUtil.initializeSpinner(xmx, 1, 65535, 512);
         SpinnerUtil.initializeSpinner(xms, 1, 65535, 128);
-        this.xmsUnit.getItems().addAll("","K","M", "G");
+        this.xmsUnit.getItems().addAll("", "K", "M", "G");
         this.xmsUnit.setValue("M");
-        this.xmxUnit.getItems().addAll("","K","M", "G");
+        this.xmxUnit.getItems().addAll("", "K", "M", "G");
         this.xmxUnit.setValue("M");
+        SpinnerUtil.initializeSpinner(printerCount, 0, 255, 1);
+        SpinnerUtil.initializeSpinner(printerDuration, 1, 3600, 60);
+        SpinnerUtil.initializeSpinner(printJobSize, 1, 1024 * 1024, 128);
+        this.printJobSizeUnit.getItems().addAll("", "K", "M", "G");
+        this.printJobSizeUnit.setValue("K");
     }
 
     @Override
@@ -99,18 +111,52 @@ public class WebServerController extends ProcessController {
     @Override
     protected String getCommandLine(final String classpath) {
 
-        //TODO add this to UI configuration
         return "java -cp \""
                 + classpath
                 + "\""
-                + (debugMode.isSelected() ? " -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + debugPort.getValue() : "")
+                + (debugMode.isSelected() ? " -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address="
+                + debugPort.getValue() : "")
                 + " -Djava.security.auth.login.config=login.conf"
-                + " -Xms" + this.xms.getValue() + this.xmsUnit.getValue()
-                + " -Xmx" + this.xmx.getValue() + this.xmxUnit.getValue()
-                + " io.bdj.web.BoutiqueDeJusWebServer -w "+warChooser.getValue()
-                + " -p " + httpPort.getValue()
-                + " -tpmn " + minThreads.getValue()
-                + " -tpmx " + maxThreads.getValue();
+                + " -Xms"
+                + this.xms.getValue()
+                + this.xmsUnit.getValue()
+                + " -Xmx"
+                + this.xmx.getValue()
+                + this.xmxUnit.getValue()
+                + " -Dbdj.qpos.count="
+                + this.printerCount.getValue()
+                + " -Dbdj.qpos.jobSize="
+                + calculateJobSize(this.printJobSize.getValue(), this.printJobSizeUnit.getValue())
+                + " -Dbdj.qpos.printTimeS="
+                + this.printerDuration.getValue()
+                + " io.bdj.web.BoutiqueDeJusWebServer -w "
+                + warChooser.getValue()
+                + " -p "
+                + httpPort.getValue()
+                + " -tpmn "
+                + minThreads.getValue()
+                + " -tpmx "
+                + maxThreads.getValue();
 
+    }
+
+    private long calculateJobSize(long base, String unit) {
+
+        long factor;
+        switch (unit) {
+            case "K":
+                factor = 1024;
+                break;
+            case "M":
+                factor = 1024 * 1024;
+                break;
+            case "G":
+                factor = 1024 * 1024 * 1024;
+                break;
+            default:
+                factor = 1;
+        }
+
+        return base * factor;
     }
 }

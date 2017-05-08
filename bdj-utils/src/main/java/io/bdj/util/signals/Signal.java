@@ -22,6 +22,7 @@ public enum Signal {
      * Shutdown a service
      */
     SHUTDOWN(new byte[] { 0x1c, 0x1c }),
+    SHUTDOWN_COMPLETE(new byte[]{0x1c, 0x06}),
     /**
      * Queries the status of a service
      */
@@ -46,9 +47,8 @@ public enum Signal {
     /**
      * Set a value on the server
      */
-    SET(new byte[]{0x53,0x56})
+    SET(new byte[]{0x53,0x56}),
     ;
-
     private static final Logger LOG = getLogger(Signal.class.getName());
 
     final byte[] byteSequence;
