@@ -11,18 +11,6 @@ import workshop.pages.Headers._
 package object pages {
 
   /**
-    * Shop pages that might be directly accessed
-    */
-  object ShopPages extends Enumeration {
-    class Page(val url:String, val chains: ChainBuilder*)
-    val Juices = new Page("http://localhost:8080/products_juices.action", pages.JuicesPage)
-    val Accessoires = new Page("http://localhost:8080/products_accessoires.action", pages.AccessoiresPage)
-    val Books = new Page("http://localhost:8080/products_books.action", pages.BooksPage)
-    val Courses = new Page("http://localhost:8080/products_courses.action", pages.CoursesPage)
-  }
-
-
-  /**
     * Headers used in the requests
     */
   object Headers {
