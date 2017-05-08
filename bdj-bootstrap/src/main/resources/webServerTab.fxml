@@ -13,8 +13,12 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.TextFlow?>
 
-<VBox fx:id="this" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="${this.parent.height}" prefWidth="${this.parent.width}"
-      xmlns="http://javafx.com/javafx/8.0.45" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.bdj.control.WebServerController">
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<VBox fx:id="this" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="${this.parent.height}" prefWidth="${this.parent.width}"
+      xmlns="http://javafx.com/javafx/8.0.45" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="io.bdj.control.WebServerController">
     <children>
 
         <GridPane fx:id="controlGrid">
@@ -30,15 +34,21 @@
                 <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <children>
                 <Button fx:id="startButton" mnemonicParsing="false" onAction="#startServer" text="Start Web Server"/>
-                <Button fx:id="stopButton" disable="true" mnemonicParsing="false" onAction="#stopServer" text="Stop Web Server" GridPane.rowIndex="1"/>
-                <Button fx:id="restartButton" disable="true" mnemonicParsing="false" onAction="#restartServer" text="Restart Web Server" GridPane.rowIndex="2"/>
-                <Circle fx:id="processStatus" fill="RED" radius="10.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1"/>
+                <Button fx:id="stopButton" disable="true" mnemonicParsing="false" onAction="#stopServer"
+                        text="Stop Web Server" GridPane.rowIndex="1"/>
+                <Button fx:id="restartButton" disable="true" mnemonicParsing="false" onAction="#restartServer"
+                        text="Restart Web Server" GridPane.rowIndex="2"/>
+                <Circle fx:id="processStatus" fill="RED" radius="10.0" stroke="BLACK" strokeType="INSIDE"
+                        GridPane.columnIndex="1"/>
                 <Label text="Select WAR:" GridPane.columnIndex="4"/>
                 <ChoiceBox fx:id="warChooser" prefWidth="150.0" GridPane.columnIndex="5"/>
-                <CheckBox fx:id="debugMode" mnemonicParsing="false" text="Debug Mode" GridPane.columnIndex="5" GridPane.rowIndex="1"/>
+                <CheckBox fx:id="debugMode" mnemonicParsing="false" text="Debug Mode" GridPane.columnIndex="5"
+                          GridPane.rowIndex="1"/>
                 <Label text="Debug Port:" GridPane.columnIndex="4" GridPane.rowIndex="2"/>
                 <Spinner fx:id="debugPort" GridPane.columnIndex="5" GridPane.rowIndex="2"/>
                 <Label text="Http Port:" GridPane.columnIndex="2"/>
@@ -47,11 +57,22 @@
                 <Spinner fx:id="minThreads" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
                 <Label text="Max Threads:" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
                 <Spinner fx:id="maxThreads" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                <Label text="Max Heap (Xmx):" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+                <HBox GridPane.columnIndex="3" GridPane.rowIndex="3">
+                    <Spinner fx:id="xmx" maxWidth="100"/>
+                    <ChoiceBox fx:id="xmxUnit"/>
+                </HBox>
+                <Label text="Initial Heap (Xms):" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+                <HBox GridPane.columnIndex="3" GridPane.rowIndex="4">
+                    <Spinner fx:id="xms" maxWidth="100"/>
+                    <ChoiceBox fx:id="xmsUnit"/>
+                </HBox>
             </children>
         </GridPane>
         <ScrollPane fx:id="scrollPane" prefHeight="${scrollPane.parent.height}" prefWidth="${scrollPane.parent.width}">
             <content>
-                <TextFlow fx:id="consoleArea" prefHeight="${consoleArea.parent.height}" prefWidth="${consoleArea.parent.width}" styleClass="console"/>
+                <TextFlow fx:id="consoleArea" prefHeight="${consoleArea.parent.height}"
+                          prefWidth="${consoleArea.parent.width}" styleClass="console"/>
             </content>
         </ScrollPane>
     </children>

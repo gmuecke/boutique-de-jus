@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -26,7 +27,7 @@ public class WebServerController extends ProcessController {
 
     private static final Logger LOG = getLogger(WebServerController.class.getName());
     @FXML
-    public ChoiceBox warChooser;
+    public ChoiceBox<Path> warChooser;
     @FXML
     public CheckBox debugMode;
     @FXML
@@ -37,6 +38,14 @@ public class WebServerController extends ProcessController {
     public Spinner<Integer> minThreads;
     @FXML
     public Spinner<Integer> maxThreads;
+    @FXML
+    public Spinner<Integer> xmx;
+    @FXML
+    public Spinner<Integer> xms;
+    @FXML
+    public ChoiceBox<String> xmxUnit;
+    @FXML
+    public ChoiceBox<String> xmsUnit;
 
     private SocketAddress addr = new InetSocketAddress(localhost, 11008);
 
@@ -73,7 +82,12 @@ public class WebServerController extends ProcessController {
         SpinnerUtil.initializeSpinner(httpPort, 1024, 65535, 8080);
         SpinnerUtil.initializeSpinner(minThreads, 10, 65535, 10);
         SpinnerUtil.initializeSpinner(maxThreads, 10, 65535, 80);
-
+        SpinnerUtil.initializeSpinner(xmx, 1, 65535, 512);
+        SpinnerUtil.initializeSpinner(xms, 1, 65535, 128);
+        this.xmsUnit.getItems().addAll("","K","M", "G");
+        this.xmsUnit.setValue("M");
+        this.xmxUnit.getItems().addAll("","K","M", "G");
+        this.xmxUnit.setValue("M");
     }
 
     @Override
@@ -91,9 +105,8 @@ public class WebServerController extends ProcessController {
                 + "\""
                 + (debugMode.isSelected() ? " -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + debugPort.getValue() : "")
                 + " -Djava.security.auth.login.config=login.conf"
-                //TODO make memory params configurable
-                + " -Xms128m"
-                + " -Xmx768m"
+                + " -Xms" + this.xms.getValue() + this.xmsUnit.getValue()
+                + " -Xmx" + this.xmx.getValue() + this.xmxUnit.getValue()
                 + " io.bdj.web.BoutiqueDeJusWebServer -w "+warChooser.getValue()
                 + " -p " + httpPort.getValue()
                 + " -tpmn " + minThreads.getValue()
