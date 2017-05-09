@@ -29,6 +29,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import io.bdj.config.ConfigChangeListener;
+import io.bdj.util.signals.Payloads;
 import io.bdj.util.signals.Signal;
 import io.bdj.util.signals.SignalTransceiver;
 import org.apache.commons.cli.CommandLine;
@@ -60,17 +62,23 @@ public class BoutiqueDeJusWebServer {
 
     public static void main(String... args) throws Exception {
 
+        io.bdj.config.Configuration.setProperty("bdj.qpos.count", System.getProperty("bdj.qpos.count", "1"));
+        io.bdj.config.Configuration.setProperty("bdj.qpos.jobSize", System.getProperty("bdj.qpos.jobSize", "131072"));
+        io.bdj.config.Configuration.setProperty("bdj.qpos.printTimeS", System.getProperty("bdj.qpos.printTimeS", "60"));
+
         CommandLineParser cliParser = new DefaultParser();
         CommandLine cli = cliParser.parse(cliOptions(), args);
 
-        Server server = createServer(cli);
+        final Server server = createServer(cli);
         final Path warFilePath = Paths.get(cli.getOptionValue("war"));
-        WebAppContext webapp = createWebApp(warFilePath);
+
+        final int stopPort = Integer.parseInt(System.getProperty("bdj.web.signalPort", "11008"));
+
+        final WebAppContext webapp = createWebApp(warFilePath);
 
         //TODO make the database url configurable
-        server.addBean(new EnvEntry("databaseUrl","jdbc:derby://localhost:1527/testdb"));
-        server.addBean(new EnvEntry("databaseDriver","org.apache.derby.jdbc.ClientDriver"));
-
+        server.addBean(new EnvEntry("databaseUrl", "jdbc:derby://localhost:1527/testdb"));
+        server.addBean(new EnvEntry("databaseDriver", "org.apache.derby.jdbc.ClientDriver"));
         server.setHandler(webapp);
         server.start();
 
@@ -109,11 +117,14 @@ public class BoutiqueDeJusWebServer {
             }
         });
 
-        final int stopPort = Integer.parseInt(System.getProperty("bdj.web.signalPort", "11008"));
         SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
             if (server.isRunning()) {
                 com.send(Signal.STATUS_OK, e.getReplyAddr());
             }
+        }).onReceive(Signal.SET, e -> {
+            String[] nameValuePair = Payloads.nameValuePair(e.getPayload());
+            LOG.info("Received setVal " + Arrays.toString(nameValuePair));
+            io.bdj.config.Configuration.setProperty(nameValuePair[0], nameValuePair[1]);
         }).onReceive(Signal.RESTART, e -> {
             LOG.info("Restarting Server");
             try {
@@ -138,8 +149,9 @@ public class BoutiqueDeJusWebServer {
         done.complete(null);
         pool.shutdown();
         server.join();
-
     }
+
+
 
     /**
      * Defines the CLI options for the web server.
@@ -198,7 +210,7 @@ public class BoutiqueDeJusWebServer {
             System.setProperty("jetty.base", ".");
 
             JAASLoginService loginService = new JAASLoginService();
-            if(System.getProperty("java.security.auth.login.config") == null){
+            if (System.getProperty("java.security.auth.login.config") == null) {
                 System.setProperty("java.security.auth.login.config", "bdj-web-server/login.conf");
             }
             //TODO change to DB login
@@ -220,7 +232,9 @@ public class BoutiqueDeJusWebServer {
     private static WebAppContext createWebApp(final Path webappWar) {
 
         final WebAppContext webapp = new WebAppContext();
-        //webapp.setClassLoader(Thread.currentThread().getContextClassLoader());
+//        webapp.setClassLoader(Thread.currentThread().getContextClassLoader());
+//        webapp.setParentLoaderPriority(true);
+        webapp.setSystemClasses(new String[] { io.bdj.config.Configuration.class.getName(), ConfigChangeListener.class.getName()});
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
                             ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$");
 

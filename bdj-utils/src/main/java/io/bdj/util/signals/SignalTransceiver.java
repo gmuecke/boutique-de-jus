@@ -112,7 +112,7 @@ public class SignalTransceiver implements AutoCloseable {
      *  a consumer that gets the instance of the transceiver in order to setup proper actions on receiving events
      */
     public static void acceptAndWait(InetAddress address, int listenPort, BiConsumer<SignalTransceiver, CompletableFuture<Event>> prepare){
-        try (SignalTransceiver com = SignalTransceiver.create(listenPort).start()) {
+        try (SignalTransceiver com = SignalTransceiver.create(address, listenPort).start()) {
             CompletableFuture<Event> stopListening = new CompletableFuture<>();
             prepare.accept(com, stopListening);
             while (!stopListening.isDone() || stopListening.isCancelled()) {

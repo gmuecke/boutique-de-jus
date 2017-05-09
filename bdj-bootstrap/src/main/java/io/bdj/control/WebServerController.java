@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -95,11 +96,33 @@ public class WebServerController extends ProcessController {
         this.xmsUnit.setValue("M");
         this.xmxUnit.getItems().addAll("", "K", "M", "G");
         this.xmxUnit.setValue("M");
+
+        //setup the printer service
         SpinnerUtil.initializeSpinner(printerCount, 0, 255, 1);
         SpinnerUtil.initializeSpinner(printerDuration, 1, 3600, 60);
         SpinnerUtil.initializeSpinner(printJobSize, 1, 1024 * 1024, 128);
         this.printJobSizeUnit.getItems().addAll("", "K", "M", "G");
         this.printJobSizeUnit.setValue("K");
+
+        bind(printerCount, "bdj.qpos.count", Spinner::getValue);
+        bind(printerDuration, "bdj.qpos.printTimeS", Spinner::getValue);
+        bind(printJobSize, "bdj.qpos.jobSize", s -> calculateJobSize(s.getValue(), this.printJobSizeUnit.getValue()));
+        bind(printJobSizeUnit, "bdj.qpos.jobSize", s -> calculateJobSize(this.printJobSize.getValue(),
+                                                                         String.valueOf(s.getValue())));
+
+    }
+
+    private <E extends Spinner<?>> void bind(E spinner, String configName, Function<E, Number> value){
+        spinner.valueProperty().addListener((obs, ov, nv) -> setVal(configName , value.apply(spinner)));
+    }
+    private <E extends ChoiceBox<?>> void bind(E choiceBox, String configName, Function<E, Number> value){
+        choiceBox.valueProperty().addListener((obs, ov, nv) -> setVal(configName , value.apply(choiceBox)));
+    }
+
+    private void setVal(String name, Number value){
+
+        LOG.info("setting " + name + "=" + value);
+        com().send(Signal.SET, name + "=" + value, getServiceAddress());
     }
 
     @Override
