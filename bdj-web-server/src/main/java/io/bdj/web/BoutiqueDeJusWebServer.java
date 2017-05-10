@@ -177,19 +177,14 @@ public class BoutiqueDeJusWebServer {
 
             JAASLoginService loginService = new JAASLoginService();
             if (System.getProperty("java.security.auth.login.config") == null) {
-                System.setProperty("java.security.auth.login.config", "bdj-web-server/login.conf");
+                URL jaasConfigURL = BoutiqueDeJusWebServer.class.getResource("/login.conf");
+                if(jaasConfigURL != null) {
+                    System.setProperty("java.security.auth.login.config", jaasConfigURL.toString());
+                }
             }
-            //TODO change to DB login
             loginService.setName("BoutiqueDeJusRealm");
-//            loginService.setLoginModuleName("PropertyFile");
             //TODO support admin
             loginService.setLoginModuleName("Boutique");
-            /*
-            <New class="org.eclipse.jetty.jaas.JAASLoginService">
-                <Set name="Name">BoutiqueDeJusRealm</Set>
-                <Set name="LoginModuleName">PropertyFile</Set>
-            </New>
-            */
             server.addBean(loginService);
         }
         return server;

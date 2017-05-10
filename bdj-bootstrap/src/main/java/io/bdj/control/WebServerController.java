@@ -139,7 +139,6 @@ public class WebServerController extends ProcessController {
                 + "\""
                 + (debugMode.isSelected() ? " -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address="
                 + debugPort.getValue() : "")
-                + " -Djava.security.auth.login.config=login.conf"
                 + " -Xms"
                 + this.xms.getValue()
                 + this.xmsUnit.getValue()
