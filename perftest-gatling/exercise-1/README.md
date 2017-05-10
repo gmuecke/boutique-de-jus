@@ -1,11 +1,10 @@
 Exercise 1
 ==========
 
-Set-up your local environment to record and replay gatling load simulations.
+Set-up your local environment to record and replay a specific gatling load simulation.
 
 Setup
 --------
-
 - Install Java JDK 8
 - Install Scala SDK
 - Install IntelliJ Community Edition
@@ -31,7 +30,10 @@ Record
 
 Replay
 ------
+- Open the recorded simulation in IntelliJ
+- Make modifications (e.g. add some pause, inject more users) if necessary
+- Run the simulation using maven (adapt the pom.xml if necessary)
 
-- Open the recorded simulation in IntellJ
-- make modifications if necessary
-- run the simulation using maven (adapt the pom.xml if necessary)
+Reports
+------
+- Have a look at the reports. What can you get from them?
