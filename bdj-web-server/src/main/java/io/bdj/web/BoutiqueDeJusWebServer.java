@@ -3,28 +3,15 @@ package io.bdj.web;
 import static java.util.logging.Logger.getLogger;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,11 +52,10 @@ public class BoutiqueDeJusWebServer {
         CommandLineParser cliParser = new DefaultParser();
         CommandLine cli = cliParser.parse(cliOptions(), args);
 
-        final Server server = createServer(cli);
-        final Path warFilePath = Paths.get(cli.getOptionValue("war"));
-
         final int stopPort = Integer.parseInt(System.getProperty("bdj.web.signalPort", "11008"));
 
+        final Server server = createServer(cli);
+        final Path warFilePath = Paths.get(cli.getOptionValue("war"));
         final WebAppContext webapp = createWebApp(warFilePath);
 
         //TODO make the database url configurable
@@ -78,76 +64,60 @@ public class BoutiqueDeJusWebServer {
         server.setHandler(webapp);
         server.start();
 
-        final ExecutorService pool = Executors.newFixedThreadPool(1);
-        final WatchService watcher = FileSystems.getDefault().newWatchService();
-        final Path warPath = warFilePath.getParent();
-        final WatchKey watchKey = warPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-        final CompletableFuture done = new CompletableFuture();
-        final AtomicReference<byte[]> md5 = new AtomicReference<>(md5(warFilePath));
-
-        pool.submit(() -> {
-            while (!done.isDone() && watchKey.reset()) {
-                watchKey.pollEvents()
-                        .stream()
-                        .map(event -> ((WatchEvent<Path>) event).context())
-                        .map(warPath::resolve)
-                        .filter(warFilePath::equals)
-                        .filter(p -> filesize(p) > 0)
-                        .findFirst()
-                        .ifPresent(p -> {
-                            waitUntilStable(p, 500, 2000);
-                            final byte[] newMD5 = md5(p);
-                            LOG.info("Checking updated war");
-                            if (!Arrays.equals(md5.getAndSet(newMD5), newMD5)) {
-                                try {
-                                    restartWebServer(server, createWebApp(p));
-                                } catch (Exception e) {
-                                    LOG.log(Level.SEVERE, e, () -> "Server restart failed");
-                                    done.complete(null);
-                                }
-                            }
-                        });
-                if (!sleep(500)) {
-                    done.complete(null);
+        try (FileWatcher watcher = new FileWatcher(warFilePath)) {
+            final AtomicReference<byte[]> md5 = new AtomicReference<>(FileWatcher.md5(warFilePath));
+            watcher.on(StandardWatchEventKinds.ENTRY_MODIFY, p -> {
+                //TODO redesign the refresh cycle to prevent locks on file when building with maven
+                /*
+                 * An option would be to let the server run on a copy of the file (in a temp dir)
+                 * and watch the maven output file. When the output changes, the server is stopped,
+                 * the file copied and server restarted with the new file
+                 */
+                waitUntilStable(p, 500, 2000);
+                final byte[] newMD5 = FileWatcher.md5(p);
+                LOG.info("Checking updated war");
+                if (!Arrays.equals(md5.getAndSet(newMD5), newMD5)) {
+                    try {
+                        restartWebServer(server, createWebApp(p));
+                    } catch (Exception e) {
+                        LOG.log(Level.SEVERE, e, () -> "Server restart failed");
+                    }
                 }
-            }
-        });
+            });
 
-        SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
-            if (server.isRunning()) {
-                com.send(Signal.STATUS_OK, e.getReplyAddr());
-            }
-        }).onReceive(Signal.SET, e -> {
-            String[] nameValuePair = Payloads.nameValuePair(e.getPayload());
-            LOG.info("Received setVal " + Arrays.toString(nameValuePair));
-            io.bdj.config.Configuration.setProperty(nameValuePair[0], nameValuePair[1]);
-        }).onReceive(Signal.RESTART, e -> {
-            LOG.info("Restarting Server");
-            try {
-                WebAppContext webApp = createWebApp(warFilePath);
-                restartWebServer(server, webApp);
-                com.send(Signal.OK, e.getReplyAddr());
-            } catch (Exception e1) {
-                LOG.log(Level.SEVERE, e1, () -> "Restart failed, stopping server");
+            SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
+                if (server.isRunning()) {
+                    com.send(Signal.STATUS_OK, e.getReplyAddr());
+                }
+            }).onReceive(Signal.SET, e -> {
+                String[] nameValuePair = Payloads.nameValuePair(e.getPayload());
+                LOG.info("Received setVal " + Arrays.toString(nameValuePair));
+                io.bdj.config.Configuration.setProperty(nameValuePair[0], nameValuePair[1]);
+            }).onReceive(Signal.RESTART, e -> {
+                LOG.info("Restarting Server");
+                try {
+
+                    WebAppContext webApp = createWebApp(warFilePath);
+                    restartWebServer(server, webApp);
+                    com.send(Signal.OK, e.getReplyAddr());
+                } catch (Exception e1) {
+                    LOG.log(Level.SEVERE, e1, () -> "Restart failed, stopping server");
+                    fut.complete(e);
+                }
+
+            }).onReceive(Signal.SHUTDOWN, e -> {
+                LOG.info("Received stop signal from " + e.getReplyAddr());
                 fut.complete(e);
-            }
-
-        }).onReceive(Signal.SHUTDOWN, e -> {
-            LOG.info("Received stop signal from " + e.getReplyAddr());
-            fut.complete(e);
-            try {
-                server.stop();
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-            //TODO send init OK to hub
-        }));
-        done.complete(null);
-        pool.shutdown();
-        server.join();
+                try {
+                    server.stop();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+                //TODO send init OK to hub
+            }));
+            server.join();
+        }
     }
-
-
 
     /**
      * Defines the CLI options for the web server.
@@ -230,7 +200,9 @@ public class BoutiqueDeJusWebServer {
         final WebAppContext webapp = new WebAppContext();
 //        webapp.setClassLoader(Thread.currentThread().getContextClassLoader());
 //        webapp.setParentLoaderPriority(true);
-        webapp.setSystemClasses(new String[] { io.bdj.config.Configuration.class.getName(), ConfigChangeListener.class.getName()});
+        webapp.setSystemClasses(new String[] {
+                io.bdj.config.Configuration.class.getName(), ConfigChangeListener.class.getName()
+        });
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
                             ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$");
 
@@ -247,34 +219,6 @@ public class BoutiqueDeJusWebServer {
         return webapp;
     }
 
-    public static byte[] md5(Path file) {
-
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            try (InputStream is = Files.newInputStream(file);
-                 DigestInputStream dis = new DigestInputStream(is, md)) {
-                while (dis.read() != -1) {
-                    //noop
-                }
-                return md.digest();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return EMPTY_MD5;
-    }
-
-    public static long filesize(Path p) {
-
-        try {
-            return Files.size(p);
-        } catch (IOException e) {
-            return -1;
-        }
-    }
-
     /**
      * Waits until there is no more size increase within a given interval
      *
@@ -285,14 +229,14 @@ public class BoutiqueDeJusWebServer {
 
         long timeoutAt = timeout + System.currentTimeMillis();
         long initialSize;
-        long newSize = filesize(p);
+        long newSize = FileWatcher.filesize(p);
         //wait until there are no more size increases
         do {
             initialSize = newSize;
             if (!sleep(intervalMs)) {
                 break;
             }
-            newSize = filesize(p);
+            newSize = FileWatcher.filesize(p);
         } while (newSize != -1 && initialSize < newSize && (timeoutAt > System.currentTimeMillis()));
     }
 
@@ -306,16 +250,6 @@ public class BoutiqueDeJusWebServer {
         server.setHandler(webApp);
         server.start();
         LOG.info("Server restarted");
-    }
-
-    public static boolean sleep(long time) {
-
-        try {
-            Thread.sleep(time);
-            return true;
-        } catch (InterruptedException e) {
-            return false;
-        }
     }
 
     /**
@@ -386,5 +320,15 @@ public class BoutiqueDeJusWebServer {
         List<ContainerInitializer> initializers = new ArrayList<>();
         initializers.add(initializer);
         return initializers;
+    }
+
+    public static boolean sleep(long time) {
+
+        try {
+            Thread.sleep(time);
+            return true;
+        } catch (InterruptedException e) {
+            return false;
+        }
     }
 }
