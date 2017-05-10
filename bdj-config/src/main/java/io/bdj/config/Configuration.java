@@ -36,6 +36,7 @@ public final class Configuration {
     }
 
     private static void notifyListeners(final String key, final String newValue) {
+
         EVENT_THREAD.execute(() -> LISTENERS.stream().filter(l -> l.test(key)).forEach(l -> l.accept(key, newValue)));
     }
 
@@ -51,7 +52,12 @@ public final class Configuration {
 
     public static Optional<String> getProperty(String key) {
 
-        return Optional.ofNullable(CONFIG.get(key));
+        String val = CONFIG.get(key);
+        if (val == null) {
+            val = System.getProperty(key);
+        }
+
+        return Optional.ofNullable(val);
     }
 
     public static Boolean getBoolean(String key) {

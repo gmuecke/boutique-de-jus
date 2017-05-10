@@ -62,10 +62,6 @@ public class BoutiqueDeJusWebServer {
 
     public static void main(String... args) throws Exception {
 
-        io.bdj.config.Configuration.setProperty("bdj.qpos.count", System.getProperty("bdj.qpos.count", "1"));
-        io.bdj.config.Configuration.setProperty("bdj.qpos.jobSize", System.getProperty("bdj.qpos.jobSize", "131072"));
-        io.bdj.config.Configuration.setProperty("bdj.qpos.printTimeS", System.getProperty("bdj.qpos.printTimeS", "60"));
-
         CommandLineParser cliParser = new DefaultParser();
         CommandLine cli = cliParser.parse(cliOptions(), args);
 
