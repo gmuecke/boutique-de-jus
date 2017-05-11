@@ -87,9 +87,15 @@ public class WebServerController extends ProcessController {
         }
 
         SpinnerUtil.initializeSpinner(debugPort, 1024, 65535, 1044);
+
         SpinnerUtil.initializeSpinner(httpPort, 1024, 65535, 8080);
+        bind(httpPort, "jetty.http.port", Spinner::getValue);
+
         SpinnerUtil.initializeSpinner(minThreads, 10, 65535, 10);
         SpinnerUtil.initializeSpinner(maxThreads, 10, 65535, 80);
+        bind(minThreads, "jetty.threads.min", Spinner::getValue);
+        bind(maxThreads, "jetty.threads.max", Spinner::getValue);
+
         SpinnerUtil.initializeSpinner(xmx, 1, 65535, 512);
         SpinnerUtil.initializeSpinner(xms, 1, 65535, 128);
         this.xmsUnit.getItems().addAll("", "K", "M", "G");
@@ -107,22 +113,10 @@ public class WebServerController extends ProcessController {
         bind(printerCount, "bdj.qpos.count", Spinner::getValue);
         bind(printerDuration, "bdj.qpos.printTimeS", Spinner::getValue);
         bind(printJobSize, "bdj.qpos.jobSize", s -> calculateJobSize(s.getValue(), this.printJobSizeUnit.getValue()));
-        bind(printJobSizeUnit, "bdj.qpos.jobSize", s -> calculateJobSize(this.printJobSize.getValue(),
-                                                                         String.valueOf(s.getValue())));
+        bind(printJobSizeUnit,
+             "bdj.qpos.jobSize",
+             s -> calculateJobSize(this.printJobSize.getValue(), String.valueOf(s.getValue())));
 
-    }
-
-    private <E extends Spinner<?>> void bind(E spinner, String configName, Function<E, Number> value){
-        spinner.valueProperty().addListener((obs, ov, nv) -> setVal(configName , value.apply(spinner)));
-    }
-    private <E extends ChoiceBox<?>> void bind(E choiceBox, String configName, Function<E, Number> value){
-        choiceBox.valueProperty().addListener((obs, ov, nv) -> setVal(configName , value.apply(choiceBox)));
-    }
-
-    private void setVal(String name, Number value){
-
-        LOG.info("setting " + name + "=" + value);
-        com().send(Signal.SET, name + "=" + value, getServiceAddress());
     }
 
     @Override
@@ -134,6 +128,7 @@ public class WebServerController extends ProcessController {
     @Override
     protected String getCommandLine(final String classpath) {
 
+        //TODO improve building the command line / or use the process builder
         return "java -cp \""
                 + classpath
                 + "\""
@@ -145,6 +140,11 @@ public class WebServerController extends ProcessController {
                 + " -Xmx"
                 + this.xmx.getValue()
                 + this.xmxUnit.getValue()
+                + " -Djetty.threads.min="
+                + minThreads.getValue()
+                + " -Djetty.threads.max="
+                + maxThreads.getValue()
+                + " -Djetty.http.port" + httpPort.getValue()
                 + " -Dbdj.qpos.count="
                 + this.printerCount.getValue()
                 + " -Dbdj.qpos.jobSize="
@@ -152,13 +152,7 @@ public class WebServerController extends ProcessController {
                 + " -Dbdj.qpos.printTimeS="
                 + this.printerDuration.getValue()
                 + " io.bdj.web.BoutiqueDeJusWebServer -w "
-                + warChooser.getValue()
-                + " -p "
-                + httpPort.getValue()
-                + " -tpmn "
-                + minThreads.getValue()
-                + " -tpmx "
-                + maxThreads.getValue();
+                + warChooser.getValue();
 
     }
 
@@ -180,5 +174,21 @@ public class WebServerController extends ProcessController {
         }
 
         return base * factor;
+    }
+
+    private <E extends Spinner<?>> void bind(E spinner, String configName, Function<E, Number> value) {
+
+        spinner.valueProperty().addListener((obs, ov, nv) -> setVal(configName, value.apply(spinner)));
+    }
+
+    private <E extends ChoiceBox<?>> void bind(E choiceBox, String configName, Function<E, Number> value) {
+
+        choiceBox.valueProperty().addListener((obs, ov, nv) -> setVal(configName, value.apply(choiceBox)));
+    }
+
+    private void setVal(String name, Number value) {
+
+        LOG.info("setting " + name + "=" + value);
+        com().send(Signal.SET, name + "=" + value, getServiceAddress());
     }
 }

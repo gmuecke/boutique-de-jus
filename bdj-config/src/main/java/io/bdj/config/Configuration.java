@@ -1,5 +1,7 @@
 package io.bdj.config;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -7,18 +9,52 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Central Configuration instance
  */
 public final class Configuration {
 
+    private static final Logger LOG = getLogger(Configuration.class.getName());
+
     /**
      * Central store for all configuration settings
      */
     private static final Map<String, String> CONFIG = new ConcurrentHashMap<>();
     private static final List<ConfigChangeListener> LISTENERS = new CopyOnWriteArrayList<>();
-    private static final ExecutorService EVENT_THREAD = Executors.newFixedThreadPool(1);
+    /*
+     We use a single thread. Every event may block the distribution of further events. This is intentional,
+     that way event handling methods don't have to deal with concurrent events.
+     */
+    private static final ExecutorService EVENT_THREAD = Executors.newFixedThreadPool(1, new EventThreadFactory());
+
+    static class EventThreadFactory implements ThreadFactory {
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        EventThreadFactory() {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() :
+                    Thread.currentThread().getThreadGroup();
+            namePrefix = "config-event-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                                  namePrefix + threadNumber.getAndIncrement(),
+                                  0);
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
+    }
 
     private Configuration() {
 
@@ -37,7 +73,13 @@ public final class Configuration {
 
     private static void notifyListeners(final String key, final String newValue) {
 
-        EVENT_THREAD.execute(() -> LISTENERS.stream().filter(l -> l.test(key)).forEach(l -> l.accept(key, newValue)));
+        EVENT_THREAD.submit(() -> LISTENERS.stream().filter(l -> l.test(key)).forEach(l -> {
+            try {
+                l.accept(key, newValue);
+            }catch(Exception e){
+                LOG.log(Level.WARNING, "Applying config change " + key + "=" + newValue + " failed", e);
+            }
+        }));
     }
 
     public static Integer getInteger(String key) {

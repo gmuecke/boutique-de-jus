@@ -3,6 +3,7 @@ package io.bdj.web;
 import static java.util.logging.Logger.getLogger;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.bdj.config.ConfigChangeListener;
+import io.bdj.config.Configuration;
 import io.bdj.util.signals.Payloads;
 import io.bdj.util.signals.Signal;
 import io.bdj.util.signals.SignalTransceiver;
@@ -34,7 +36,6 @@ import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlConfiguration;
 
@@ -92,7 +93,7 @@ public class BoutiqueDeJusWebServer {
             }).onReceive(Signal.SET, e -> {
                 String[] nameValuePair = Payloads.nameValuePair(e.getPayload());
                 LOG.info("Received setVal " + Arrays.toString(nameValuePair));
-                io.bdj.config.Configuration.setProperty(nameValuePair[0], nameValuePair[1]);
+                Configuration.setProperty(nameValuePair[0], nameValuePair[1]);
             }).onReceive(Signal.RESTART, e -> {
                 LOG.info("Restarting Server");
                 try {
@@ -127,9 +128,6 @@ public class BoutiqueDeJusWebServer {
     private static Options cliOptions() {
 
         Options opts = new Options();
-        opts.addOption("tpmx", "threadPoolMax", true, "Thread Pool Max size");
-        opts.addOption("tpmn", "threadPoolMin", true, "Thread Pool Min size");
-        opts.addOption("p", "port", true, "The http port to listen");
         opts.addRequiredOption("w", "war", true, "path to the war file to deploy");
         opts.addOption("jettyConfig", true, "path to jetty config file");
         return opts;
@@ -139,52 +137,32 @@ public class BoutiqueDeJusWebServer {
 
         final Server server;
         if (cli.hasOption("jettyConfig")) {
-            LOG.info("Initializing server using config file");
-
-            List<URL> configs = Arrays.asList(new File(cli.getOptionValue("jettyConfig")).toURI().toURL());
+            URI configFile = Paths.get(cli.getOptionValue("jettyConfig")).toUri();
+            LOG.info("Initializing server using config file" + configFile);
 
             Map<String, String> props = new HashMap<>();
             props.put("jetty.home", new File(System.getProperty("user.dir")).getCanonicalPath());
 
-            server = loadServerFromConfigFile(configs, props);
+            server = loadServerFromConfigFile(Paths.get(cli.getOptionValue("jettyConfig")).toUri(), props);
 
         } else {
             LOG.info("Initializing server using command line args");
-            int threadpool_max = Integer.parseInt(cli.getOptionValue("tpmx", "80"));
-            int threadpool_min = Integer.parseInt(cli.getOptionValue("tpmn", "10"));
-            int http_port = Integer.parseInt(cli.getOptionValue("p", "8080"));
-
-            final QueuedThreadPool threadPool = new QueuedThreadPool(threadpool_max, threadpool_min);
+            final QueuedThreadPool threadPool = createThreadPool();
             server = new Server(threadPool);
+            attachServerConnector(server);
 
-            final ServerConnector connector = new ServerConnector(server);
-            //TODO config set accept queue size
-            //TODO config acceptor num
-            //TODO config selector num
-            //TODO config idle timeout
-            connector.setPort(http_port);
-            server.addConnector(connector);
-
-            Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
+            org.eclipse.jetty.webapp.Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList
+                    .setServerDefault(server);
             classlist.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration",
                                "org.eclipse.jetty.plus.webapp.EnvConfiguration",
                                "org.eclipse.jetty.plus.webapp.PlusConfiguration");
             classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
                                 "org.eclipse.jetty.annotations.AnnotationConfiguration");
 
-            System.setProperty("jetty.jaas.login.conf", "login.conf");
+            //System.setProperty("jetty.jaas.login.conf", "login.conf");
             System.setProperty("jetty.base", ".");
 
-            JAASLoginService loginService = new JAASLoginService();
-            if (System.getProperty("java.security.auth.login.config") == null) {
-                URL jaasConfigURL = BoutiqueDeJusWebServer.class.getResource("/login.conf");
-                if(jaasConfigURL != null) {
-                    System.setProperty("java.security.auth.login.config", jaasConfigURL.toString());
-                }
-            }
-            loginService.setName("BoutiqueDeJusRealm");
-            //TODO support admin
-            loginService.setLoginModuleName("Boutique");
+            final JAASLoginService loginService = prepareJaasLoginModule();
             server.addBean(loginService);
         }
         return server;
@@ -193,10 +171,8 @@ public class BoutiqueDeJusWebServer {
     private static WebAppContext createWebApp(final Path webappWar) {
 
         final WebAppContext webapp = new WebAppContext();
-//        webapp.setClassLoader(Thread.currentThread().getContextClassLoader());
-//        webapp.setParentLoaderPriority(true);
         webapp.setSystemClasses(new String[] {
-                io.bdj.config.Configuration.class.getName(), ConfigChangeListener.class.getName()
+                Configuration.class.getName(), ConfigChangeListener.class.getName()
         });
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
                             ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$");
@@ -250,69 +226,109 @@ public class BoutiqueDeJusWebServer {
     /**
      * Initializes the jetty server from XML configuratoin
      *
-     * @param xmlConfigUrls
+     * @param configFile
+     *         jetty configuration file. The file must configure a server, otherwise the method will fail
      * @param props
      *
-     * @return
+     * @return the configured server instace
      *
      * @throws Exception
      */
-    public static Server loadServerFromConfigFile(List<URL> xmlConfigUrls, Map<String, String> props) throws Exception {
+    public static Server loadServerFromConfigFile(URI configFile, Map<String, String> props) throws Exception {
 
-        //TODO simplify this method
+        XmlConfiguration configuration = new XmlConfiguration(configFile.toURL());
+        configuration.getProperties().putAll(props);
 
-        XmlConfiguration last = null;
-        // Hold list of configured objects
-        Object[] obj = new Object[xmlConfigUrls.size()];
+        return (Server) configuration.configure();
+    }
 
-        // Configure everything
-        for (int i = 0; i < xmlConfigUrls.size(); i++) {
-            URL configURL = xmlConfigUrls.get(i);
-            XmlConfiguration configuration = new XmlConfiguration(configURL);
-            if (last != null) {
-                // Let configuration know about prior configured objects
-                configuration.getIdMap().putAll(last.getIdMap());
+    /**
+     * Creates a new thread pool for the server and hooks it's properties to the configuration events
+     *
+     * @return a new thread pool
+     */
+    private static QueuedThreadPool createThreadPool() {
+
+        final QueuedThreadPool threadPool = new QueuedThreadPool();
+        threadPool.setMinThreads(Configuration.getInteger("jetty.threads.min", 10));
+        threadPool.setMaxThreads(Configuration.getInteger("jetty.threads.max", 80));
+        Configuration.addListener(ConfigChangeListener.forConfigProperty("jetty.threads.min", (k, v) -> {
+            threadPool.setMinThreads(Integer.parseInt(v));
+            restartThreadPool(threadPool);
+            LOG.info("Successfully resized threadpool " + k + "=" + v);
+        }));
+        Configuration.addListener(ConfigChangeListener.forConfigProperty("jetty.threads.max", (k, v) -> {
+            threadPool.setMaxThreads(Integer.parseInt(v));
+            restartThreadPool(threadPool);
+            LOG.info("Successfully resized threadpool " + k + "=" + v);
+        }));
+        return threadPool;
+    }
+
+    /**
+     * Attaches a server connector listening on the specified port to the server. Further the connector
+     * is hooked into the configuration system to received runtime port changes
+     *
+     * @param server
+     *         the Jetty server
+     *
+     * @return the created conector
+     */
+    private static ServerConnector attachServerConnector(final Server server) {
+
+        int initialHttpPort = Configuration.getInteger("jetty.http.port", 8080);
+
+        //TODO config set accept queue size
+        //TODO config acceptor num
+        //TODO config selector num
+        //TODO config idle timeout
+        final ServerConnector connector = new ServerConnector(server);
+        connector.setPort(initialHttpPort);
+        server.addConnector(connector);
+
+        Configuration.addListener(ConfigChangeListener.forConfigProperty("jetty.http.port", (k, v) -> {
+            LOG.info("Changing http port to " + v);
+            connector.setPort(Integer.parseInt(v));
+            try {
+                connector.stop();
+                connector.start();
+                LOG.info("HTTP Port changed");
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, "Restarting connector failed", e);
             }
-            configuration.getProperties().putAll(props);
-            obj[i] = configuration.configure();
-            last = configuration;
-        }
+        }));
+        return connector;
+    }
 
-        // Find Server Instance.
-        Server foundServer = null;
-        int serverCount = 0;
-        for (int i = 0; i < xmlConfigUrls.size(); i++) {
-            if (obj[i] instanceof Server) {
-                if (obj[i].equals(foundServer)) {
-                    // Identical server instance found
-                    continue; // Skip
-                }
-                foundServer = (Server) obj[i];
-                serverCount++;
+    /**
+     * Creeates a the JAAS login module and sets up the configuration
+     * @return
+     *  the new jaas login module
+     */
+    private static JAASLoginService prepareJaasLoginModule() {
+
+        final JAASLoginService loginService = new JAASLoginService();
+        if (System.getProperty("java.security.auth.login.config") == null) {
+            URL jaasConfigURL = BoutiqueDeJusWebServer.class.getResource("/login.conf");
+            if (jaasConfigURL != null) {
+                System.setProperty("java.security.auth.login.config", jaasConfigURL.toString());
             }
         }
-
-        if (serverCount <= 0) {
-            throw new IllegalStateException("Load failed to configure a " + Server.class.getName());
-        }
-
-        if (serverCount == 1) {
-            return foundServer;
-        }
-
-        throw new IllegalStateException(String.format("Configured %d Servers, expected 1", serverCount));
+        loginService.setName("BoutiqueDeJusRealm");
+        loginService.setLoginModuleName("Boutique");
+        return loginService;
     }
 
     /**
      * Initializer to activate JSP support in Jetty.
      *
-     * @return
+     * @return list of initializer to support jsp compiling
      */
     private static List<ContainerInitializer> jspInitializers() {
 
-        JettyJasperInitializer sci = new JettyJasperInitializer();
-        ContainerInitializer initializer = new ContainerInitializer(sci, null);
-        List<ContainerInitializer> initializers = new ArrayList<>();
+        final JettyJasperInitializer sci = new JettyJasperInitializer();
+        final ContainerInitializer initializer = new ContainerInitializer(sci, null);
+        final List<ContainerInitializer> initializers = new ArrayList<>();
         initializers.add(initializer);
         return initializers;
     }
@@ -324,6 +340,23 @@ public class BoutiqueDeJusWebServer {
             return true;
         } catch (InterruptedException e) {
             return false;
+        }
+    }
+
+    /**
+     * Restarts the web servers thread pool
+     *
+     * @param threadPool
+     */
+    private static void restartThreadPool(final QueuedThreadPool threadPool) {
+
+        try {
+            LOG.info("Restarting threadpool");
+            threadPool.stop();
+            threadPool.start();
+            LOG.info("Thread pool restarted");
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Failed to resize thread pool");
         }
     }
 }
