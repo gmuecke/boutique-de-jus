@@ -3,6 +3,7 @@ package io.bdj.web;
 import static java.util.logging.Logger.getLogger;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
@@ -22,10 +23,6 @@ import io.bdj.config.Configuration;
 import io.bdj.util.signals.Payloads;
 import io.bdj.util.signals.Signal;
 import io.bdj.util.signals.SignalTransceiver;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
@@ -50,46 +47,42 @@ public class BoutiqueDeJusWebServer {
 
     public static void main(String... args) throws Exception {
 
-        CommandLineParser cliParser = new DefaultParser();
-        CommandLine cli = cliParser.parse(cliOptions(), args);
 
         final int stopPort = Integer.parseInt(System.getProperty("bdj.web.signalPort", "11008"));
 
-        final Server server = createServer(cli);
-        final Path warFilePath = Paths.get(cli.getOptionValue("war"));
-        final WebAppContext webapp = createWebApp(warFilePath);
+        final Server server = createServer();
+
 
         //TODO make the database url configurable
         server.addBean(new EnvEntry("databaseUrl", "jdbc:derby://localhost:1527/testdb"));
         server.addBean(new EnvEntry("databaseDriver", "org.apache.derby.jdbc.ClientDriver"));
+
+
+        final Path warFilePath = Paths.get(Configuration.getProperty("jetty.deploy.war").orElseThrow(() -> new RuntimeException("No war file specified")));
+        final WebAppContext webapp = createWebApp(warFilePath);
         server.setHandler(webapp);
         server.start();
 
-        LOG.info("Creating file watcher");
+        Configuration.addListener(ConfigChangeListener.forConfigProperty("jetty.deploy.war", (k,v) -> {
+            LOG.info("Deploying warfile " + v);
+            redeployApp(server, Paths.get(v));
+        }));
+
+        LOG.info("Creating file watcher for file " + warFilePath);
         try (FileWatcher watcher = new FileWatcher(warFilePath)) {
-            LOG.info("Configuring FileWatcher");
+
             final AtomicReference<byte[]> md5 = new AtomicReference<>(FileWatcher.md5(warFilePath));
-            LOG.info("Calculated initial MD5");
             watcher.on(StandardWatchEventKinds.ENTRY_MODIFY, p -> {
-                //TODO redesign the refresh cycle to prevent locks on file when building with maven
-                /*
-                 * An option would be to let the server run on a copy of the file (in a temp dir)
-                 * and watch the maven output file. When the output changes, the server is stopped,
-                 * the file copied and server restarted with the new file
-                 */
-                waitUntilStable(p, 500, 2000);
+
+                if(!FileWatcher.tryWriteLock(p)){
+                    return;
+                }
                 final byte[] newMD5 = FileWatcher.md5(p);
-                LOG.info("Checking updated war");
-                if (!Arrays.equals(md5.getAndSet(newMD5), newMD5)) {
-                    try {
-                        restartWebServer(server, createWebApp(p));
-                    } catch (Exception e) {
-                        LOG.log(Level.SEVERE, e, () -> "Server restart failed");
-                    }
+                if (newMD5 != EMPTY_MD5 && !Arrays.equals(md5.getAndSet(newMD5), newMD5)) {
+                    LOG.info("Detected modified file " + p);
+                    redeployApp(server, p);
                 }
             });
-
-            LOG.info("Creating Signal Transceiver");
             SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
                 if (server.isRunning()) {
                     com.send(Signal.STATUS_OK, e.getReplyAddr());
@@ -124,35 +117,34 @@ public class BoutiqueDeJusWebServer {
         }
     }
 
-    /**
-     * Defines the CLI options for the web server.
-     *
-     * @return
-     */
-    private static Options cliOptions() {
+    private static void redeployApp(final Server server, final Path warFilePath) {
 
-        //TODO get rid of CLI options
-        /*
-         server can be configured using system properties and the Configuration system, with runtime updates.
-         so there is no need for CLI arguments. Removing them will simplify this class
-         */
-        Options opts = new Options();
-        opts.addRequiredOption("w", "war", true, "path to the war file to deploy");
-        opts.addOption("jettyConfig", true, "path to jetty config file");
-        return opts;
+        try {
+            server.stop();
+            server.join();
+            LOG.info("Server stopped");
+            WebAppContext webApp = createWebApp(warFilePath);
+            server.setHandler(webApp);
+            server.start();
+            LOG.info("Server restarted");
+
+        } catch (Exception e) {
+            throw new RuntimeException("War file could not been redeployed",e);
+        }
     }
 
-    private static Server createServer(final CommandLine cli) throws Exception {
+    private static Server createServer() throws Exception {
 
+        final String configFile = System.getProperty("jetty.configFile");
         final Server server;
-        if (cli.hasOption("jettyConfig")) {
-            URI configFile = Paths.get(cli.getOptionValue("jettyConfig")).toUri();
+        if (configFile != null) {
+            final URI configFileUri = Paths.get(configFile).toUri();
             LOG.info("Initializing server using config file" + configFile);
 
-            Map<String, String> props = new HashMap<>();
+            final Map<String, String> props = new HashMap<>();
             props.put("jetty.home", new File(System.getProperty("user.dir")).getCanonicalPath());
 
-            server = loadServerFromConfigFile(Paths.get(cli.getOptionValue("jettyConfig")).toUri(), props);
+            server = loadServerFromConfigFile(configFileUri, props);
 
         } else {
             LOG.info("Initializing server using command line args");
@@ -183,7 +175,12 @@ public class BoutiqueDeJusWebServer {
      * @return
      *  a webApplication context that can be deployed on the jetty server.
      */
-    private static WebAppContext createWebApp(final Path webappWar) {
+    private static WebAppContext createWebApp(final Path webappWar) throws IOException {
+
+//        Path tempWar = Files.createTempFile("bdj-", webappWar.getFileName().toString());
+//        LOG.info("Creating temporary copy of war " + tempWar);
+//        Files.copy(webappWar, tempWar, StandardCopyOption.REPLACE_EXISTING);
+//        LOG.info("Deploying web app from " + tempWar);
 
         final WebAppContext webapp = new WebAppContext();
         webapp.setSystemClasses(new String[] {

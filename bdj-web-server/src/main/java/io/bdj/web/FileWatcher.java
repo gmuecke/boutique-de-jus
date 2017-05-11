@@ -5,9 +5,12 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
@@ -53,7 +56,7 @@ public class FileWatcher implements AutoCloseable {
         this.executor.scheduleAtFixedRate(() -> {
             watchKeys.forEach(watchKey -> processWatchKey(watchKey, watchedFile));
             watchKeys.retainAll(watchKeys.stream().filter(WatchKey::reset).collect(toList()));
-        }, 500, 250, TimeUnit.MILLISECONDS);
+        }, 250, 100, TimeUnit.MILLISECONDS);
 
     }
 
@@ -101,7 +104,7 @@ public class FileWatcher implements AutoCloseable {
     public static byte[] md5(Path file) {
 
         try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            final MessageDigest md5 = MessageDigest.getInstance("MD5");
             try (DigestInputStream dis = new DigestInputStream(new BufferedInputStream(Files.newInputStream(file)), md5)) {
                 while (dis.read() != -1) {
                     //noop
@@ -133,12 +136,22 @@ public class FileWatcher implements AutoCloseable {
         }
     }
 
-    public FileWatcher on(WatchEvent.Kind<?> event, Consumer<Path> changeHandler) throws IOException {
+    /**
+     * Registers a handler to be notified upon events of the specified kind.
+     * @param kind
+     *  kind of event to notified the handler
+     * @param changeHandler
+     *  the action to perform on the file upon the occurrence of events of the specified kind.
+     * @return
+     *  this watcher
+     * @throws IOException
+     */
+    public FileWatcher on(WatchEvent.Kind<?> kind, Consumer<Path> changeHandler) throws IOException {
 
         synchronized (this) {
-            final WatchKey watchKey = this.containingDir.register(this.watchService, event);
-            this.handlers.putIfAbsent(event, new CopyOnWriteArrayList<>());
-            this.handlers.get(event).add(changeHandler);
+            final WatchKey watchKey = this.containingDir.register(this.watchService, kind);
+            this.handlers.putIfAbsent(kind, new CopyOnWriteArrayList<>());
+            this.handlers.get(kind).add(changeHandler);
             this.watchKeys.add(watchKey);
         }
         return this;
@@ -151,12 +164,37 @@ public class FileWatcher implements AutoCloseable {
         this.executor.shutdownNow();
     }
 
+    /**
+     * Tries to obtain a write lock on the file. This can be used to verify that no other processes concurrently
+     * writes to the file, for example to check that writing to a file, i.e. on a MODIFY_ENTRY event, is completed
+     * @param path
+     *  the path to the file
+     * @return
+     *  true, if the lock could be obtained. False, if not. Please not that the lock is released once the method
+     *  returns!
+     */
+    public static boolean tryWriteLock(final Path path) {
+        try(FileChannel ch = FileChannel.open(path, StandardOpenOption.WRITE);
+            FileLock lock = ch.lock()){
+
+            if(lock == null) {
+                LOG.log(Level.INFO, "Could not obtain lock on file, maybe still writing");
+                return false;
+            } else {
+                return true;
+            }
+        } catch (IOException e) {
+            LOG.log(Level.INFO, "File not open for write access", e);
+            return false;
+        }
+    }
+
     private static class Tuple<T1, T2> {
 
         private final T1 first;
         private final T2 second;
 
-        public Tuple(final T1 first, final T2 second) {
+        Tuple(final T1 first, final T2 second) {
 
             this.first = first;
             this.second = second;

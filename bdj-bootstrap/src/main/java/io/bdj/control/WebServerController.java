@@ -85,6 +85,7 @@ public class WebServerController extends ProcessController {
         } catch (IOException e) {
             LOG.warning("Could not populate chooser list");
         }
+        bind(warChooser, "jetty.deploy.war", ChoiceBox::getValue);
 
         SpinnerUtil.initializeSpinner(debugPort, 1024, 65535, 1044);
 
@@ -95,6 +96,7 @@ public class WebServerController extends ProcessController {
         SpinnerUtil.initializeSpinner(maxThreads, 10, 65535, 80);
         bind(minThreads, "jetty.threads.min", Spinner::getValue);
         bind(maxThreads, "jetty.threads.max", Spinner::getValue);
+
 
         SpinnerUtil.initializeSpinner(xmx, 1, 65535, 512);
         SpinnerUtil.initializeSpinner(xms, 1, 65535, 128);
@@ -116,6 +118,7 @@ public class WebServerController extends ProcessController {
         bind(printJobSizeUnit,
              "bdj.qpos.jobSize",
              s -> calculateJobSize(this.printJobSize.getValue(), String.valueOf(s.getValue())));
+
 
     }
 
@@ -144,15 +147,17 @@ public class WebServerController extends ProcessController {
                 + minThreads.getValue()
                 + " -Djetty.threads.max="
                 + maxThreads.getValue()
-                + " -Djetty.http.port" + httpPort.getValue()
+                + " -Djetty.http.port="
+                + httpPort.getValue()
+                + " -Djetty.deploy.war="
+                + warChooser.getValue()
                 + " -Dbdj.qpos.count="
                 + this.printerCount.getValue()
                 + " -Dbdj.qpos.jobSize="
                 + calculateJobSize(this.printJobSize.getValue(), this.printJobSizeUnit.getValue())
                 + " -Dbdj.qpos.printTimeS="
                 + this.printerDuration.getValue()
-                + " io.bdj.web.BoutiqueDeJusWebServer -w "
-                + warChooser.getValue();
+                + " io.bdj.web.BoutiqueDeJusWebServer ";
 
     }
 
@@ -176,17 +181,17 @@ public class WebServerController extends ProcessController {
         return base * factor;
     }
 
-    private <E extends Spinner<?>> void bind(E spinner, String configName, Function<E, Number> value) {
+    private <T, E extends Spinner<?>> void bind(E spinner, String configName, Function<E, T> value) {
 
         spinner.valueProperty().addListener((obs, ov, nv) -> setVal(configName, value.apply(spinner)));
     }
 
-    private <E extends ChoiceBox<?>> void bind(E choiceBox, String configName, Function<E, Number> value) {
+    private <T, E extends ChoiceBox<?>> void bind(E choiceBox, String configName, Function<E, T> value) {
 
         choiceBox.valueProperty().addListener((obs, ov, nv) -> setVal(configName, value.apply(choiceBox)));
     }
 
-    private void setVal(String name, Number value) {
+    private <T> void setVal(String name, T value) {
 
         LOG.info("setting " + name + "=" + value);
         com().send(Signal.SET, name + "=" + value, getServiceAddress());
