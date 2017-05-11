@@ -18,9 +18,9 @@ import javafx.scene.control.Spinner;
 public class DatabaseController extends ProcessController implements Initializable {
 
     @FXML
-    public Spinner timeSlice;
+    public Spinner<Integer> timeSlice;
     @FXML
-    public Spinner threads;
+    public Spinner<Integer> threads;
 
     private SocketAddress addr = new InetSocketAddress(localhost, 11009);
 

@@ -91,7 +91,7 @@ public abstract class ProcessController implements Initializable {
 
         startButton.disableProperty().bind(processRunning);
         stopButton.disableProperty().bind(processRunning.not());
-        restartButton.disableProperty().bind(processRunning.not());
+//        restartButton.disableProperty().bind(processRunning.not());
         processRunning.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 processStatus.setFill(Color.GREEN);
