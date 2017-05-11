@@ -65,8 +65,11 @@ public class BoutiqueDeJusWebServer {
         server.setHandler(webapp);
         server.start();
 
+        LOG.info("Creating file watcher");
         try (FileWatcher watcher = new FileWatcher(warFilePath)) {
+            LOG.info("Configuring FileWatcher");
             final AtomicReference<byte[]> md5 = new AtomicReference<>(FileWatcher.md5(warFilePath));
+            LOG.info("Calculated initial MD5");
             watcher.on(StandardWatchEventKinds.ENTRY_MODIFY, p -> {
                 //TODO redesign the refresh cycle to prevent locks on file when building with maven
                 /*
@@ -86,6 +89,7 @@ public class BoutiqueDeJusWebServer {
                 }
             });
 
+            LOG.info("Creating Signal Transceiver");
             SignalTransceiver.acceptAndWait(stopPort, (com, fut) -> com.onReceive(Signal.QUERY_STATUS, e -> {
                 if (server.isRunning()) {
                     com.send(Signal.STATUS_OK, e.getReplyAddr());
@@ -127,6 +131,11 @@ public class BoutiqueDeJusWebServer {
      */
     private static Options cliOptions() {
 
+        //TODO get rid of CLI options
+        /*
+         server can be configured using system properties and the Configuration system, with runtime updates.
+         so there is no need for CLI arguments. Removing them will simplify this class
+         */
         Options opts = new Options();
         opts.addRequiredOption("w", "war", true, "path to the war file to deploy");
         opts.addOption("jettyConfig", true, "path to jetty config file");
@@ -159,7 +168,6 @@ public class BoutiqueDeJusWebServer {
             classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
                                 "org.eclipse.jetty.annotations.AnnotationConfiguration");
 
-            //System.setProperty("jetty.jaas.login.conf", "login.conf");
             System.setProperty("jetty.base", ".");
 
             final JAASLoginService loginService = prepareJaasLoginModule();
@@ -168,6 +176,13 @@ public class BoutiqueDeJusWebServer {
         return server;
     }
 
+    /**
+     * Creates a web-app deployment for a war file gives as path
+     * @param webappWar
+     *  path to the war file
+     * @return
+     *  a webApplication context that can be deployed on the jetty server.
+     */
     private static WebAppContext createWebApp(final Path webappWar) {
 
         final WebAppContext webapp = new WebAppContext();
@@ -213,6 +228,11 @@ public class BoutiqueDeJusWebServer {
 
     private static void restartWebServer(final Server server, final WebAppContext webApp) throws Exception {
 
+        //TODO reconsider restart function
+        /*
+          restart doesnt help much regarding heap configuration, everything else can be configured at
+          runtime. So better approach for convenient restart would be an orderly shutdown and start.
+         */
         server.stop();
         LOG.info("Sent stop");
         server.join();

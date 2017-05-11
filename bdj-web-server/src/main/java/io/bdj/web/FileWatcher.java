@@ -3,6 +3,7 @@ package io.bdj.web;
 import static java.util.logging.Logger.getLogger;
 import static java.util.stream.Collectors.toList;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -17,14 +18,16 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * File watcher than can be used to monitor a single file. Handlers can be registered to react on specific watch
+ * events. The method provides a convenient access to the nio.files Watch API
  */
 public class FileWatcher implements AutoCloseable {
 
@@ -32,9 +35,8 @@ public class FileWatcher implements AutoCloseable {
 
     private static final byte[] EMPTY_MD5 = new byte[0];
 
-    private final Path watchedFile;
     private final Path containingDir;
-    private final ExecutorService executor;
+    private final ScheduledExecutorService executor;
     private final WatchService watchService;
     private final CompletableFuture<Object> done;
 
@@ -43,43 +45,73 @@ public class FileWatcher implements AutoCloseable {
 
     public FileWatcher(final Path watchedFile) throws IOException {
 
-        this.watchedFile = watchedFile;
         this.containingDir = watchedFile.getParent();
-        this.executor = Executors.newFixedThreadPool(1);
+        this.executor = Executors.newScheduledThreadPool(1);
         this.watchService = FileSystems.getDefault().newWatchService();
         this.done = new CompletableFuture<>();
 
-        this.executor.submit(() -> {
-            while (!done.isDone()) {
-                watchKeys.forEach(watchKey -> watchKey.pollEvents()
-                                                      .stream()
-                                                      .map(event -> (WatchEvent<Path>) event)
-                                                      .map(event -> new Tuple<>(event.kind(),
-                                                                                containingDir.resolve(event.context())))
-                                                      .filter(t -> watchedFile.equals(t.second))
-                                                      .filter(t -> filesize(t.second) > 0)
-                                                      .findFirst()
-                                                      .ifPresent(t -> handlers.get(t.first)
-                                                                              .forEach(h -> h.accept(t.second))));
-
-                //purge watchkeys all watchkeys that are no longer valid
-                watchKeys.retainAll(watchKeys.stream().filter(WatchKey::reset).collect(toList()));
-
-                if (!sleep(500)) {
-                    done.complete(null);
-                }
-            }
-        });
+        this.executor.scheduleAtFixedRate(() -> {
+            watchKeys.forEach(watchKey -> processWatchKey(watchKey, watchedFile));
+            watchKeys.retainAll(watchKeys.stream().filter(WatchKey::reset).collect(toList()));
+        }, 500, 250, TimeUnit.MILLISECONDS);
 
     }
 
-    public static long filesize(Path p) {
+    private void processWatchKey(final WatchKey watchKey, final Path watchedFile) {
+
+        watchKey.pollEvents()
+                .stream()
+                .map(event -> new Tuple<>(event.kind(), containingDir.resolve((Path) event.context())))
+                .filter(t -> watchedFile.equals(t.second) && filesize(t.second) > 0)
+                .findFirst()
+                .ifPresent(t -> handlers.get(t.first).forEach(h -> {
+                    try {
+                        h.accept(t.second);
+                    } catch (Exception e) {
+                        LOG.log(Level.WARNING, "Error processing watch event for file " + watchedFile, e);
+                    }
+                }));
+    }
+
+    /**
+     * Calculates the size of the file without throwing an exception. If the file size can not be determined due
+     * to an exception, the method returns -1
+     * @param p
+     *  the path to the file
+     * @return
+     *  either the filesize or -1 if the size can not be determined
+     */
+    static long filesize(Path p) {
 
         try {
             return Files.size(p);
         } catch (IOException e) {
             return -1;
         }
+    }
+
+    /**
+     * Calculates the MD5 hash of a file
+     *
+     * @param file
+     *         the path to the file. The method does not chech if it's a real file or path
+     *
+     * @return the byte sequence representing the MD5 hash or an empty byte array if the hash could not be computed
+     */
+    public static byte[] md5(Path file) {
+
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            try (DigestInputStream dis = new DigestInputStream(new BufferedInputStream(Files.newInputStream(file)), md5)) {
+                while (dis.read() != -1) {
+                    //noop
+                }
+                return md5.digest();
+            }
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Can not calculate MD5 of " + file, e);
+        }
+        return EMPTY_MD5;
     }
 
     /**
@@ -102,6 +134,7 @@ public class FileWatcher implements AutoCloseable {
     }
 
     public FileWatcher on(WatchEvent.Kind<?> event, Consumer<Path> changeHandler) throws IOException {
+
         synchronized (this) {
             final WatchKey watchKey = this.containingDir.register(this.watchService, event);
             this.handlers.putIfAbsent(event, new CopyOnWriteArrayList<>());
@@ -109,30 +142,6 @@ public class FileWatcher implements AutoCloseable {
             this.watchKeys.add(watchKey);
         }
         return this;
-    }
-
-    /**
-     * Calculates the MD5 hash of a file
-     *
-     * @param file
-     *         the path to the file. The method does not chech if it's a real file or path
-     *
-     * @return the byte sequence representing the MD5 hash or an empty byte array if the hash could not be computed
-     */
-    public static byte[] md5(Path file) {
-
-        try {
-            final MessageDigest md = MessageDigest.getInstance("MD5");
-            try (DigestInputStream dis = new DigestInputStream(Files.newInputStream(file), md)) {
-                while (dis.read() != -1) {
-                    //noop
-                }
-                return md.digest();
-            }
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Can not calculate MD5 of " + file, e);
-        }
-        return EMPTY_MD5;
     }
 
     @Override
