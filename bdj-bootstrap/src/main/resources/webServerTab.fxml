@@ -30,8 +30,8 @@
                 <Button fx:id="startButton" mnemonicParsing="false" onAction="#startServer" text="Start Web Server"/>
                 <Button fx:id="stopButton" disable="true" mnemonicParsing="false" onAction="#stopServer"
                         text="Stop Web Server" GridPane.rowIndex="1"/>
-                <Button fx:id="restartButton" disable="true" mnemonicParsing="false" onAction="#restartServer"
-                        text="Restart Web Server" GridPane.rowIndex="2"/>
+                <!--<Button fx:id="restartButton" disable="true" mnemonicParsing="false" onAction="#restartServer"-->
+                        <!--text="Restart Web Server" GridPane.rowIndex="2"/>-->
                 <Circle fx:id="processStatus" fill="RED" radius="10.0" stroke="BLACK" strokeType="INSIDE"
                         GridPane.columnIndex="1"/>
                 <Label text="Select WAR:" GridPane.columnIndex="4"/>

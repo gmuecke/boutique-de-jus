@@ -28,7 +28,7 @@
          <children>
             <Button mnemonicParsing="false" onAction="#startServer" text="Start DB Server" fx:id="startButton" />
             <Button mnemonicParsing="false" onAction="#stopServer" text="Stop DB Server" GridPane.rowIndex="1" fx:id="stopButton" disable="true" />
-            <Button mnemonicParsing="false" onAction="#restartServer" text="Restart DB Server" GridPane.rowIndex="2" fx:id="restartButton" disable="true"/>
+            <!--<Button mnemonicParsing="false" onAction="#restartServer" text="Restart DB Server" GridPane.rowIndex="2" fx:id="restartButton" disable="true"/>-->
             <Circle fx:id="processStatus" fill="RED" radius="10.0" stroke="BLACK" strokeType="INSIDE" GridPane.columnIndex="1" />
              <Label text="TimeSlice:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
              <Spinner fx:id="timeSlice" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
