@@ -100,6 +100,9 @@ public class QueuedPrintOrderService implements OrderService {
 
     private int addToJob(Object o, byte[] job, int offset) {
 
+        if(o == null) {
+            return 0;
+        }
         byte[] oData = o.toString().getBytes();
         System.arraycopy(oData, 0, job, offset, oData.length);
         return oData.length;

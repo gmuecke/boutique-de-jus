@@ -29,6 +29,7 @@ public class OrderAction extends ActionSupport implements SessionAware, RequestA
     private Map<Product, Integer> cart = new HashMap<>();
     private Double total;
     private Customer customer;
+    private String order;
 
     @Override
     public String execute() throws Exception {
