@@ -1,6 +1,6 @@
 # Boutique-de-jus
 
-~~Is~~ Will be a demo application with several performance flaws and issues intentionally built-in in order to 
+Is a demo application with several performance flaws and issues intentionally built-in in order to 
 practice several techniques in the Java Performance world (Performance Testing, - analysis, tuning, monitoring).
  
 The idea is derived from the [OWASP Juice Shop](https://www.owasp.org/index.php/OWASP_Juice_Shop_Project) which 
@@ -8,6 +8,57 @@ The idea is derived from the [OWASP Juice Shop](https://www.owasp.org/index.php/
   
 Same as the OWASP Juice Shop the name is a literal translation of the German term _Saftladen_, which is a really
 badly run place (i.e. a shop, a bar, an office), where nothing really works and everything sucks, a.k.a a dump.
+
+# Setup
+
+Build the workshop
+
+    mvn clean install
+    
+Start the server via bootstrap
+
+    mvn exec:exec -pl bdj-bootstrap
+
+For Maven offline mode - if you don't have a good network connection and prepared a local
+repository, add the ``-o`` argument to the ``mvn`` command.
+
+To use a local repository use the `-Dmaven.repo.local=PathToLocalDir` system property.
+
+For example, building offline from a local repo:
+
+    mvn -Dmaven.repo.local=/local-repo -o clean install
+    mvn -Dmaven.repo.local=/local-repo -o exec:exec
+ 
+
+# Architecture
+
+Given the multitude of problems, the bdj has to consist of multiple microservices (is a thing right now anyway, eh?).
+To make things a bit more manageable, there will be a boot strapper, that starts the various (native) processes.
+So it's easier to keep track of changes and modify during runtime. 
+
+The following technologies / frameworks will be used to implement the microservices.
+
+The entire shop won't use any Client-side JS technology, the focus is purely on Java. Therefore the shop
+uses plain html+css, and a bit of javascript for ajax calls, but thats it. The pages are rendered on server
+side. One of the intentions is to have fun with java during the development of the Boutique and be a 
+JavaScript FullStick-developer (only stick, no carrots) :)
+
+Frontend:
+ - Struts-based MVC running on embedded Jetty
+Backend:
+ - Product-catalog-Service
+    - file storage 
+    - vert.x service (async, event loop)
+    - HTTP endpoint
+ - Order-Service
+    - DB storeage, JDBC
+    - integration via HTTP or RMI?
+ - Help Service
+    - File Storage
+    - HTTP endpoint
+ - User Service
+    - File based service
+    - thread based
 
 # Bug ideas
 
@@ -49,33 +100,3 @@ badly run place (i.e. a shop, a bar, an office), where nothing really works and 
 - Advanced stealth modes:
   - change behavior when profiler (jms) is connected
   - change behavior when debugger is connected
-
-# Architecture
-
-Given the multitude of problems, the bdj has to consist of multiple microservices (is a thing right now anyway, eh?).
-To make things a bit more manageable, there will be a boot strapper, that starts the various (native) processes.
-So it's easier to keep track of changes and modify during runtime. 
-
-The following technologies / frameworks will be used to implement the microservices.
-
-The entire shop won't use any Client-side JS technology, the focus is purely on Java. Therefore the shop
-uses plain html+css, and a bit of javascript for ajax calls, but thats it. The pages are rendered on server
-side. One of the intentions is to have fun with java during the development of the Boutique and be a 
-JavaScript FullStick-developer (only stick, no carrots) :)
-
-Frontend:
- - Struts-based MVC running on embedded Jetty
-Backend:
- - Product-catalog-Service
-    - file storage 
-    - vert.x service (async, event loop)
-    - HTTP endpoint
- - Order-Service
-    - DB storeage, JDBC
-    - integration via HTTP or RMI?
- - Help Service
-    - File Storage
-    - HTTP endpoint
- - User Service
-    - File based service
-    - thread based
