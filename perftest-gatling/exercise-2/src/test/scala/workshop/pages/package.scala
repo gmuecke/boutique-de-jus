@@ -1,7 +1,6 @@
 package workshop
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
 import workshop.pages.Headers._
 

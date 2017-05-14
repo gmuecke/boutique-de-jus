@@ -19,7 +19,6 @@
                 <executions>
                     <execution>
                         <id>anonymousVisit</id>
-                        <phase/>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -29,7 +28,6 @@
                     </execution>
                     <execution>
                         <id>register</id>
-                        <phase/>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -39,7 +37,6 @@
                     </execution>
                     <execution>
                         <id>order</id>
-                        <phase/>
                         <goals>
                             <goal>execute</goal>
                         </goals>

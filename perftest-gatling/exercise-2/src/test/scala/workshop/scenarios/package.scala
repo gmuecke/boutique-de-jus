@@ -1,7 +1,6 @@
 package workshop
 
 import io.gatling.core.Predef._
-import io.gatling.http.Predef._
 import workshop.pages._
 
 import scala.concurrent.duration.FiniteDuration
@@ -28,6 +27,7 @@ package object scenarios {
     .exec(chains.welcome)
     .exec(chains.anonymousBrowsing)
 
+  //an example of doing a chain continuously for a specific time
   def onlyBrowsingBenchmark(duration : FiniteDuration) = scenario("Only Browser")
     .during(duration){
       exec(chains.welcome)
