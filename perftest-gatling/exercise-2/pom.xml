@@ -24,7 +24,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <sc>workshop.AnonymousVisitSimulation</sc>
+                            <sc>workshop.workshop.AnonymousVisitSimulation</sc>
                         </configuration>
                     </execution>
                     <execution>
