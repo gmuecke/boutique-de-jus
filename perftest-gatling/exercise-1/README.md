@@ -4,7 +4,7 @@ Exercise 1 (Getting started with Record & Replay)
 
 Context
 ---------------
-The juice shop / We wanna go online as soon as possible! / Do we have performance issue that could hinder us from doing so?
+The juice shop / We wanna go online as soon as possible! / Do we have performance issues that could hinder us from doing so?
 
 Criterias
 ---------------
@@ -16,29 +16,32 @@ Record a first very simple flow for load testing.
 
 Install (Setup)
 ---------------
-- Install Java JDK 8 (http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-- Install Scala SDK (https://www.scala-lang.org/download)
-- Install IntelliJ Community Edition (https://www.jetbrains.com/idea/download)
-- Install IntelliJ Scala Plugin (Preferences/Plugins/Install JetBrains plugin... -> search for 'Scala')
-- Import this module
-- Install VisualVM (https://visualvm.github.io)
-
-IntelliJ:
- - Add Framework Support... > Scala 
-
-Optional: Download Gatling
+- Install Java JDK 8
+- Install Scala SDK
+- Install IntelliJ Community Edition
+- Install IntelliJ Scala Plugin (Preferences/Plugins/Install JetBrains plugin<... -> search for 'Scala')
+- Install (unzip) VisualVM
+- Unzip the boutique-de-jus-master.zip (this contains the sources)
+- Unzip the local local-repo.zip (this contains all maven dependencies)
+- Open IntelliJ and -> File/New/Project from existing sources...
+- Go to Maven Projects menu (on the right navigation pane)
+- Go to boutique-de-jus (root)/Lifecycle and run the maven command 'install'
+- Go to bdj-boostrap/Plugins/exec and run exec:exec (to start the shop)
+ - Start the Boutique Bootstrap
+   - Start the DB Server
+   - Start the WebServer
+- Open a browser at http://localhost:8080
 
 Script (Record)
 ---------------
-- Start the Gatling recorder
-   - via commandline or via maven plugin
-   - configure Proxy and SUT ports
+- Start the Gatling recorder -> go to module getting-started/Plugins/gatling and run gatling:recorder
+- Browser: configure Proxy and SUT ports
 - Option 1: Configure your browser to use the proxy (port as configured before)
-- Start the Boutique Bootstrap
-  - Start the DB Server
-  - Start the WebServer
 - Record a simple script
-- Option 2: Store the HAL transcript from the browser and use recorder in HAL mode
+- Go to module perftest-gatling and right click on getting-started
+ - Add Framework Support... > Scala
+- Go to src/test and right click on scala
+- (Option 2 for https: Store the HAL transcript from the browser and use recorder in HAL mode)
 
 Execute and Monitor
 ---------------
@@ -49,17 +52,12 @@ Execute and Monitor
 
 Analyze
 ---------------
-Analyze the test results in the team and come to a conclusion what the facts are.
+Have a look at the gatling reports. What can you get from them?
 
 Report
 ---------------
-Prepare for a short debriefing by using the PROOF heuristic:
-- Past: What have you recorded and why?
-- Results: Have a look at the generated Gatling reports. What can you get from them?
-- Obstacles: Anything that got in your way while testing? 
-- Outlook: Is there anything left that you think needs to be done before doing an next iteration?
-- Feelings: How do you feel regarding your performance test-session? Are you satisfied or would you change something before doing an other iteration?
-
+-
+ 
 Iterate
 ---------------
 We're not done yet, there are two more Test Missions to go.

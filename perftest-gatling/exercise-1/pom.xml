@@ -24,7 +24,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <sc>workshop.AnonymousVisitSimulation</sc>
+                            <sc>io.bdj.RecordedSimulation</sc>
                         </configuration>
                     </execution>
                 </executions>
