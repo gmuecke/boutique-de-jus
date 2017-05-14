@@ -33,6 +33,17 @@ public class DerbyStandalone {
         final PrintWriter out = new PrintWriter(System.out);
         server.start(out);
 
+        LOG.info("Waiting for server to be started");
+        for (int i = 0; i < 10; ++i) {
+            try {
+                LOG.info("Pinging server ... ");
+                server.ping();
+                break;
+            } catch (Exception e) {
+                LOG.warning("Server is not started yet ..., retrying after 20 ms");
+            }
+            Thread.sleep(20);
+        }
 
         server.setTimeSlice(Integer.getInteger("db.timeslice", 5));
         server.setMaxThreads(Integer.getInteger("db.threads", 10));
