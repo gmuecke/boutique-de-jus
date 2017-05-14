@@ -9,36 +9,30 @@ The juice shop / We wanna go online as soon as possible! / Do we have performanc
 Criterias
 ---------------
 Can you provide us with the following information:
-- Can we handle a total distribution of 100k user/h, where we have a success rate (submitted orders) of 10%?
-- Can we achieve a turnover rate of 500k$/day (15Mio$/month)?
+- Can we handle a total of 100k user/h, where we have a conversion rate (submitted orders) of 10%?
 - Can we achieve an overall response time per page of 1.5s - 4s?
+- Can you give us any recommendations regarding capacity? And why?
 
 Design
 ---------------
-Model your new/existing test-scenarios by thinking of:
-- How can we test for this business criterias?
-- TODO
-
-Maybe you wanna document them somewhere ;)
+Model a load profile that supports testing our business requirements.
 
 Install (Setup)
 ---------------
-Already done in excercise 1
+Already done in exercise 1
 
 Script
 ---------------
-- Reuse one scenario from exercise 2 (or use the ones provided)
+- Reuse your scenarios from exercise 2 (or use the ones provided)
 - Inject load
-    - Closed loop (numbers of users, using "during")
-    - Open loop (constant rate)
     
 Execute and Monitor
 ---------------
-TODO
+- Run the scenarios and monitor the application with VisualVM
 
 Analyze
 ---------------
-Analyze the test results in the team and come to a conclusion what the facts are.
+Analyze the test results in the team and gather your toughts what's happening here.
 
 Report
 ---------------
@@ -48,7 +42,3 @@ Prepare for a short debriefing by using the PROOF heuristic:
 - Obstacles: Anything that got in your way while testing? 
 - Outlook: Is there anything left that you think needs to be done before doing an next iteration?
 - Feelings: How do you feel regarding your performance test-session? Are you satisfied or would you change something before doing an other iteration?
-
-Iterate
----------------
-We're not done yet, there is one more Test Missions to go.

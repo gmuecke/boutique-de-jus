@@ -8,44 +8,39 @@ The juice shop / We wanna go online as soon as possible! / Do we have performanc
 
 Criterias
 ---------------
-- Can you provide us with 3 user scenarios which cover the most critical flows of the juice shop?
-- Are the scripts executable on your machine?
-- Can you even make a percentage split of the users?
+- Can you provide us with at least two user scenarios which cover the most critical flows (hint: consider
+ our business goals) of the juice shop?
+- What are the response times for the different pages (load: 1user)?
 
 Design
 ---------------
-Identify and model three different user scenarios. Maybe you wanna document them somewhere ;)
+Identify and model at least two different user scenarios. Maybe you wanna document them somewhere ;-)
 
 Install (Setup)
 ---------------
-Already done in excercise 1
+Already done in exercise 1
 
 Script
 ---------------
-- Record each user scenario separately
+- Record each user scenario separately (recommended)
 - Create a Scala Object `Pages`
     - add the `http()` pages to the `Pages` object
 - Create a Scala Object `Scenarios`
     - define the workflow chains (`exec(page1).exec(page2)`) to the `Scenarios` object
 - Create a Simulation
-    - define a Scenario (`scenario()`) that combines all the three workflows and make a percentage split
+    - define a Scenario (`scenario()`) that combines all your workflows and make a percentage split
 
-Execute and Monitor
+Execute (only)
 ---------------
-TODO
+- Run the scenarios
 
 Analyze
 ---------------
-Analyze the test results in the team and come to a conclusion what the facts are.
+Have a look at the gatling reports for the reponse time.
 
 Report
 ---------------
-Prepare for a short debriefing by using the PROOF heuristic:
-- Past: What have you recorded and why?
-- Results: Have a look at the generated Gatling reports. What can you get from them?
-- Obstacles: Anything that got in your way while testing? 
-- Outlook: Is there anything left that you think needs to be done before doing an next iteration?
-- Feelings: How do you feel regarding your performance test-session? Are you satisfied or would you change something before doing an other iteration?
+-
 
 Iterate
 ---------------
