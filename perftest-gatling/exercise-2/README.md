@@ -1,4 +1,4 @@
-Exercise 2 (Model User Scenarios)
+Exercise 2
 ==========
 (Test Mission2 given to you by using the CCD IS E(M)ARI heuristic)
 
