@@ -41,7 +41,7 @@ public class DerbyStandalone {
                 server.ping();
                 break;
             } catch (Exception e) {
-                LOG.warning("Server is not started yet ..., retrying after 20 ms");
+                LOG.warning("Server is not started yet ..., retrying after " + i + "s" );
             }
             Thread.sleep(1000 * i);
         }
