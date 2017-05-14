@@ -42,17 +42,19 @@ class AnonymousVisitSimulation extends Simulation {
     "Origin" -> "http://localhost:8080",
     "Upgrade-Insecure-Requests" -> "1")
 
+  val page1 = http("Index Page")
+    .get("/")
+    .headers(headers_1)
+    .resources(
+      http("Welcome Page")
+        .get("/Welcome.action")
+        .headers(headers_1),
+      http("Stylesheet")
+        .get("/style/bdj.css")
+        .headers(headers_3))
+
   val scn = scenario("RecordedSimulation")
-    .exec(http("Index Page")
-      .get("/")
-      .headers(headers_1)
-      .resources(
-        http("Welcome Page")
-          .get("/Welcome.action")
-          .headers(headers_1),
-        http("Stylesheet")
-          .get("/style/bdj.css")
-          .headers(headers_3)))
+    .exec(page1)
     .pause(10)
     .exec(http("Juices Page")
       .get("/products_juices.action")
