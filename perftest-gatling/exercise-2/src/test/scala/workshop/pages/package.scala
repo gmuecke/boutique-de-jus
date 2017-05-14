@@ -29,6 +29,12 @@ package object pages {
       "Accept-Encoding" -> "gzip, deflate, br")
   }
 
+  /**
+    * this page definition is a group of executions, with a single execution containing a sequence of http
+    * request that comprise the page. The Grouping helps in the generated reports that all explicit and
+    * implicit requests (i.e. inferred resource) are grouped into one group (with summary stats, like page load
+    * for the group) which improves readability of the report.
+    */
   def WelcomePage = group("Welcome Page") {
     exec(http("/")
       .get("/")
@@ -42,6 +48,23 @@ package object pages {
         .get("/style/bdj.css")
         .headers(acceptCss)))
   }
+
+  /*
+   * this page definition is just the plain sequence of http requests. The sequence is the same as in the
+   * WelcomePage above, but without grouping
+   */
+  def Welcome = http("/")
+    .get("/")
+    .headers(defaultHeader)
+    //resources are loaded in parallel
+    .resources(
+    http("/Welcome.action")
+      .get("/Welcome.action")
+      .headers(defaultHeader),
+    http("/style/bdj.css")
+      .get("/style/bdj.css")
+      .headers(acceptCss))
+
 
   def JuicesPage = group("Juices Page") {
     exec(http("/products_juices.action")
