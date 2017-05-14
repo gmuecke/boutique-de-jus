@@ -34,7 +34,8 @@ public class DerbyStandalone {
         server.start(out);
 
         LOG.info("Waiting for server to be started");
-        for (int i = 0; i < 10; ++i) {
+        final int maxRetries = 10;
+        for (int i = 1; i <= maxRetries; ++i) {
             try {
                 LOG.info("Pinging server ... ");
                 server.ping();
@@ -42,7 +43,7 @@ public class DerbyStandalone {
             } catch (Exception e) {
                 LOG.warning("Server is not started yet ..., retrying after 20 ms");
             }
-            Thread.sleep(20);
+            Thread.sleep(1000 * i);
         }
 
         server.setTimeSlice(Integer.getInteger("db.timeslice", 5));
