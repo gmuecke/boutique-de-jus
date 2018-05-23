@@ -1,7 +1,6 @@
 package workshop
 
 import io.gatling.core.Predef._
-import io.gatling.http.Predef._
 import workshop.pages._
 
 /**
@@ -42,6 +41,13 @@ package object scenarios {
         .exec(chains.logout)
     }
   }
+
+  val mostBrowseSomeShop9010 = scenario("Most Browser, Some Shop 80/20")
+    .exec(chains.welcome).
+    .randomSwitch(
+      0.90 -> chains.anonymousBrowsing,
+      0.10 -> chains.shopProducts("test","test")("1", "4", "16", "16")
+    )
 
   val mostBrowseSomeShop8020 = scenario("Most Browser, Some Shop 80/20")
     .exec(chains.welcome)

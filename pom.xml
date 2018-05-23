@@ -2,22 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <groupId>io.bdj</groupId>
     <artifactId>boutique-de-jus</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+
     <modules>
-        <module>bdj-db-server</module>
-        <module>bdj-web-server</module>
-        <module>bdj-shop-web</module>
-        <module>bdj-utils</module>
-        <module>bdj-bootstrap</module>
         <module>perftest-gatling</module>
-        <module>bdj-services</module>
-        <module>bdj-model</module>
-        <module>bdj-config</module>
+        <module>bdj-webshop</module>
     </modules>
-    <modelVersion>4.0.0</modelVersion>
 
     <build>
         <plugins>
