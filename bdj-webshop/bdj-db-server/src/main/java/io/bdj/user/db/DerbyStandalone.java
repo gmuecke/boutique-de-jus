@@ -49,6 +49,9 @@ public class DerbyStandalone {
         server.setTimeSlice(Integer.getInteger("db.timeslice", 5));
         server.setMaxThreads(Integer.getInteger("db.threads", 10));
 
+        //init the driver
+        DriverManager.registerDriver(new org.apache.derby.jdbc.ClientDriver());
+
         try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/testdb;create=true");
              Statement statement = conn.createStatement()) {
 
