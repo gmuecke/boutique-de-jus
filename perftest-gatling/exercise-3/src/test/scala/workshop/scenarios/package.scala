@@ -43,7 +43,7 @@ package object scenarios {
   }
 
   val mostBrowseSomeShop9010 = scenario("Most Browser, Some Shop 80/20")
-    .exec(chains.welcome).
+    .exec(chains.welcome)
     .randomSwitch(
       0.90 -> chains.anonymousBrowsing,
       0.10 -> chains.shopProducts("test","test")("1", "4", "16", "16")
