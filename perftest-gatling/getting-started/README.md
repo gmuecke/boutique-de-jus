@@ -1,6 +1,5 @@
-Exercise 1 (Getting started with Record & Replay)
+Getting Started
 ==========
-(Test Mission1 given to you by using the CCD IS E(M)ARI heuristic)
 
 Context
 ---------------
@@ -16,22 +15,13 @@ Record a first very simple flow for load testing.
 
 Install (Setup)
 ---------------
-- Install Java JDK 8
-- Install Scala SDK
-- Install IntelliJ Community Edition
-- Install IntelliJ Scala Plugin (Preferences/Plugins/Install JetBrains plugin<... -> search for 'Scala')
-- Install (unzip) VisualVM
-
-- Unzip the boutique-de-jus-master.zip (this contains the sources)
-- Unzip the local local-repo.zip (this contains all maven dependencies)
-- Open IntelliJ and -> File/New/Project from existing sources...
-- Go to Maven Projects menu (on the right navigation pane)
-- Go to boutique-de-jus (root)/Lifecycle and run the maven command 'install'
-- Go to bdj-boostrap/Plugins/exec and run exec:exec (to start the shop)
- - Start the Boutique Bootstrap
+- Start the Boutique Bootstrap
    - Start the DB Server
    - Start the WebServer
 - Open a browser at http://localhost:8080
+- Start the Recorder:
+    - RHS Maven Project (Alt+9)
+    - getting-started > Plugins > gatling > gatling:recorder 
 
 Script (Record)
 ---------------
