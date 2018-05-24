@@ -13,6 +13,22 @@
         <module>bdj-webshop</module>
     </modules>
 
+    <properties>
+        <skip.gatlingTests>true</skip.gatlingTests>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>gatling</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <skip.gatlingTests>false</skip.gatlingTests>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <pluginManagement>
             <plugins>

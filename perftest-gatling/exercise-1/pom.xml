@@ -24,6 +24,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
+                            <skip></skip>
                             <sc>io.bdj.RecordedSimulation</sc>
                         </configuration>
                     </execution>

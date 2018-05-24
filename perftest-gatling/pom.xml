@@ -43,6 +43,9 @@
                     <groupId>io.gatling</groupId>
                     <artifactId>gatling-maven-plugin</artifactId>
                     <version>${gatling-plugin.version}</version>
+                    <configuration>
+                        <skip>${skip.gatlingTests}</skip>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
