@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -76,10 +77,7 @@ public class WebServerController extends ProcessController {
 
         try {
             warChooser.getItems()
-                      .setAll(Files.find(Paths.get("."),
-                                         4,
-                                         (p, attr) -> Files.isReadable(p) && p.toString().endsWith(".war"))
-                                   .collect(Collectors.toList()));
+                      .setAll(findWarFiles());
             warChooser.getSelectionModel().selectFirst();
 
         } catch (IOException e) {
@@ -108,9 +106,9 @@ public class WebServerController extends ProcessController {
         //setup the printer service
         SpinnerUtil.initializeSpinner(printerCount, 0, 255, 1);
         SpinnerUtil.initializeSpinner(printerDuration, 1, 3600, 60);
-        SpinnerUtil.initializeSpinner(printJobSize, 1, 1024 * 1024, 128);
+        SpinnerUtil.initializeSpinner(printJobSize, 1, 1024 * 1024, 1);
         this.printJobSizeUnit.getItems().addAll("", "K", "M", "G");
-        this.printJobSizeUnit.setValue("K");
+        this.printJobSizeUnit.setValue("M");
 
         bind(printerCount, "bdj.qpos.count", Spinner::getValue);
         bind(printerDuration, "bdj.qpos.printTimeS", Spinner::getValue);
@@ -120,6 +118,14 @@ public class WebServerController extends ProcessController {
              s -> calculateJobSize(this.printJobSize.getValue(), String.valueOf(s.getValue())));
 
 
+    }
+
+    private List<Path> findWarFiles() throws IOException {
+
+        return Files.find(Paths.get("."),
+                          4,
+                          (p, attr) -> Files.isReadable(p) && p.toString().endsWith(".war"))
+                    .collect(Collectors.toList());
     }
 
     @Override
