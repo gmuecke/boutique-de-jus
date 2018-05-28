@@ -3,7 +3,11 @@ Getting Started
 
 Context
 ---------------
-The juice shop / We wanna go online as soon as possible! / Do we have performance issues that could hinder us from doing so?
+The juice shop 
+
+We wanna go online as soon as possible! 
+
+Do we have performance issues that could hinder us from doing so?
 
 Criterias
 ---------------
@@ -16,23 +20,21 @@ Record a first very simple flow for load testing.
 Install (Setup)
 ---------------
 - Start the Boutique Bootstrap
-   - Start the DB Server
-   - Start the WebServer
+   - Start the DB Server (first tab)
+   - Start the WebServer (second tab)
 - Open a browser at http://localhost:8080
 - Start the Recorder:
-    - RHS Maven Project (Alt+9)
+    - Menu: Right-Hand-Side/Maven Project (Alt+9)
     - getting-started > Plugins > gatling > gatling:recorder 
 
 Script (Record)
 ---------------
-- Start the Gatling recorder -> go to module getting-started/Plugins/gatling and run gatling:recorder
-- Browser: configure Proxy and SUT ports
-- Option 1: Configure your browser to use the proxy (port as configured before)
-- Record a simple script
-- Go to module perftest-gatling and right click on getting-started
- - Add Framework Support... > Scala
-- Go to src/test and right click on scala
-- (Option 2 for https: Store the HAL transcript from the browser and use recorder in HAL mode)
+- In the Browser's developer tools, select the network view
+- clear the history
+- open the web shop page
+- right click on the request log, save as HAR
+- open HAR file with Gatling recorder
+- save as Simulation
 
 Execute and Monitor
 ---------------
@@ -47,8 +49,8 @@ Have a look at the gatling reports. What can you get from them?
 
 Report
 ---------------
--
+- what are your findings?
  
 Iterate
 ---------------
-We're not done yet, there are two more Test Missions to go.
+- extend the scenario until you have sufficient coverage 
