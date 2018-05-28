@@ -1,6 +1,7 @@
 package io.bdj.control;
 
 import static io.bdj.util.signals.Signal.STATUS_OK;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.net.InetAddress;
 import java.net.SocketAddress;
@@ -32,11 +33,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import org.slf4j.Logger;
 
 /**
  *
  */
 public abstract class ProcessController implements Initializable {
+
+    private static final Logger LOG = getLogger(ProcessController.class);
 
     protected final InetAddress localhost = InetAddress.getLoopbackAddress();
 

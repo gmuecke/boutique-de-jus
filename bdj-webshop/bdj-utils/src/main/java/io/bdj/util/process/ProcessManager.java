@@ -25,6 +25,8 @@ import io.bdj.util.signals.SignalTransceiver;
  */
 public class ProcessManager implements AutoCloseable {
 
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ProcessManager.class);
+
     private final ScheduledExecutorService scheduler;
     private final Deque<Process> processQueue;
     private final Map<Process, List<Consumer<Process>>> processEndListeners;
@@ -95,6 +97,8 @@ public class ProcessManager implements AutoCloseable {
     }
 
     public Process startProcess(final String commandLine, String[] env, File workDir) {
+
+        LOG.info("Spawning new process using command line: {}", commandLine);
 
         if (!this.running.get()) {
             throw new IllegalStateException("Process Manager not running");
