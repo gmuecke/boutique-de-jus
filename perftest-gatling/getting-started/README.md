@@ -3,9 +3,9 @@ Getting Started
 
 Context
 ---------------
-The juice shop 
+The juice shop.
 
-We wanna go online as soon as possible! 
+We want to go online as soon as possible and sell lots of juice all over the world. 
 
 Do we have performance issues that could hinder us from doing so?
 

@@ -17,3 +17,10 @@ Unzip all zip's flat into one folder. You should have a directory structure like
 * workshop_idea.bat
 ```
 
+Start IDE
+
+    workshop_idea.bat
+    
+Start WebShop Launcher
+
+    webshop.bat
