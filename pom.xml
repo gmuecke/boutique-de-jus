@@ -9,7 +9,6 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>perftest-gatling</module>
         <module>bdj-webshop</module>
     </modules>
 
@@ -26,6 +25,16 @@
             <properties>
                 <skip.gatlingTests>false</skip.gatlingTests>
             </properties>
+        </profile>
+
+        <profile>
+            <id>exercises</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>perftest-gatling</module>
+            </modules>
         </profile>
     </profiles>
 

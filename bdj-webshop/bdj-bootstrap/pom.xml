@@ -33,6 +33,21 @@
             <artifactId>bdj-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>11</version>
+        </dependency>
         <!-- Control UI-->
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -62,7 +77,7 @@
                     <arguments>
                         <argument>-cp</argument>
                         <classpath/>
-                        <argument>io.bdj.BoutiqueDeJusBootstrap</argument>
+                        <argument>io.bdj.BoutiqueDeJusApplication</argument>
                     </arguments>
                     <classpathScope>runtime</classpathScope>
                 </configuration>
@@ -124,7 +139,7 @@
                             </descriptors>
                             <archive>
                                 <manifest>
-                                    <mainClass>io.bdj.BoutiqueDeJusBootstrap</mainClass>
+                                    <mainClass>io.bdj.Launcher</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

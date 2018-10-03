@@ -21,19 +21,16 @@ import javafx.stage.StageStyle;
 /**
  *
  */
-public class BoutiqueDeJusBootstrap extends Application {
+public class BoutiqueDeJusApplication extends Application {
 
-    private static final Logger LOG = getLogger(BoutiqueDeJusBootstrap.class.getName());
+    private static final Logger LOG = getLogger(BoutiqueDeJusApplication.class.getName());
 
     private SignalTransceiver com;
     private ConsolePipe consolePipe;
     private ScheduledExecutorService scheduler;
     private ProcessManager processManager;
 
-    public static void main(String... args) throws Exception {
 
-        BoutiqueDeJusBootstrap.launch(BoutiqueDeJusBootstrap.class);
-    }
 
     @Override
     public void init() {
