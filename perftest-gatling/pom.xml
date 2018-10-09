@@ -26,15 +26,10 @@
         -->
         <gatling.version>3.0.0-RC3</gatling.version>
         <gatling-plugin.version>3.0.0</gatling-plugin.version>
+        <scala.version>2.12.6</scala.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.scala-sbt</groupId>
-            <artifactId>sbt</artifactId>
-            <version>1.2.4</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>io.gatling.highcharts</groupId>
             <artifactId>gatling-charts-highcharts</artifactId>
@@ -62,6 +57,17 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>3.4.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
             </plugin>
         </plugins>
     </build>

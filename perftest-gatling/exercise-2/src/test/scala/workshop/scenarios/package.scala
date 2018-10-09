@@ -1,7 +1,6 @@
 package workshop
 
 import io.gatling.core.Predef._
-import workshop.pages
 import workshop.pages._
 
 import scala.concurrent.duration.FiniteDuration

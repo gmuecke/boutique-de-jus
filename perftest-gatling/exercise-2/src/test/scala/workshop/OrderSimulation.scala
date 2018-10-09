@@ -5,7 +5,7 @@ import io.gatling.http.Predef._
 
 class OrderSimulation extends Simulation {
 
-  val httpProtocol = http.
+  val httpProtocol = http
     .baseUrl("http://localhost:8080")
     .inferHtmlResources() //remove this line to no load images or scripts
     .acceptHeader("image/webp,image/*,*/*;q=0.8")
