@@ -11,7 +11,6 @@
 
     <artifactId>exercise-3</artifactId>
 
-
     <build>
         <plugins>
             <plugin>
@@ -22,7 +21,7 @@
                         <id>webshop</id>
                         <phase/>
                         <goals>
-                            <goal>execute</goal>
+                            <goal>test</goal>
                         </goals>
                         <configuration>
                             <sc>workshop.WebShopSimulation</sc>
