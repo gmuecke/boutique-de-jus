@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 class WebShopSimulation extends Simulation{
 
   val httpProtocol = http
-    .baseURL("http://localhost:8080")
+    .baseUrl("http://localhost:8080")
     .inferHtmlResources()
     .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
     .acceptEncodingHeader("gzip, deflate, sdch, br")

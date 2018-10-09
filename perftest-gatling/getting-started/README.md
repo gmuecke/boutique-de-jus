@@ -9,7 +9,7 @@ We want to go online as soon as possible and sell lots of juice all over the wor
 
 Do we have performance issues that could hinder us from doing so?
 
-Criterias
+Criteria
 ---------------
 Set-up your local environment to record and replay a specific gatling load simulation.
 

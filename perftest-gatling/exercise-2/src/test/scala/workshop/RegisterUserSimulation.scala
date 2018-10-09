@@ -6,7 +6,7 @@ import io.gatling.http.Predef._
 class RegisterUserSimulation extends Simulation {
 
   val httpProtocol = http
-    .baseURL("http://localhost:8080")
+    .baseUrl("http://localhost:8080")
     .inferHtmlResources()
     .acceptHeader("image/webp,image/*,*/*;q=0.8")
     .acceptEncodingHeader("gzip, deflate, sdch, br")
