@@ -4,7 +4,9 @@ Exercise 3 (Load Modelling)
 
 Context
 ---------------
-The juice shop / We wanna go online as soon as possible! / Do we have performance issues that could hinder us from doing so?
+The juice shop
+ We want to go online as soon as possible! 
+ Do we have performance issues that could hinder us from doing so?
 
 Criterias
 ---------------

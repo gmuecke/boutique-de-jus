@@ -1,10 +1,12 @@
 Exercise 1 (Getting started with Record & Replay)
 ==========
-(Test Mission1 given to you by using the CCD IS E(M)ARI heuristic)
+(Test Mission1 given to you by using the CCD IS EARI heuristic)
 
 Context
 ---------------
-The juice shop / We wanna go online as soon as possible! / Do we have performance issues that could hinder us from doing so?
+The juice shop.
+ We want to go online as soon as possible!
+ Do we have performance issues that could hinder us from doing so?
 
 Criterias
 ---------------

@@ -8,17 +8,18 @@ import scala.concurrent.duration._
 
 
 /**
-  *
+  * Example for dynamic search query requests. I.e. for real time searches (not implemented in BDJ)
   */
 object Search {
 
   def main(args: Array[String]): Unit = {
 
     def searchThreshold = 3
+
     def word = "Quelloffen"
 
     def searchQueries = Range(searchThreshold, word.length + 1)
-        .map(i => word.substring(0, i))
+      .map(i => word.substring(0, i))
 
     println(searchQueries)
 
@@ -36,7 +37,7 @@ object Search {
 
         foreach(feederData, "rtquery", "counter") {
           exec(flattenMapIntoAttributes("${rtquery}"))
-            .exec( http("${counter}:query='${rtquery}'")
+            .exec(http("${counter}:query='${rtquery}'")
               .get("/search/?query=${rtquery}"))
             .pace(paceTime)
         }
