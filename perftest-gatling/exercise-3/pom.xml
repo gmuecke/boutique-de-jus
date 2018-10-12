@@ -24,7 +24,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <sc>workshop.WebShopSimulation</sc>
+                            <simulationClass>workshop.WebShopSimulation</simulationClass>
                         </configuration>
                     </execution>
                 </executions>

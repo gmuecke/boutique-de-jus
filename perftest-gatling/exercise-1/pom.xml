@@ -21,11 +21,11 @@
                         <id>simple</id>
                         <phase/>
                         <goals>
-                            <goal>execute</goal>
+                            <goal>test</goal>
                         </goals>
                         <configuration>
                             <skip></skip>
-                            <sc>io.bdj.RecordedSimulation</sc>
+                            <simulationClass>io.bdj.RecordedSimulation</simulationClass>
                         </configuration>
                     </execution>
                 </executions>

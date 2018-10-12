@@ -59,10 +59,10 @@
                         <id>simple</id>
                         <phase/>
                         <goals>
-                            <goal>execute</goal>
+                            <goal>test</goal>
                         </goals>
                         <configuration>
-                            <sc>workshop.RecordedSimulation</sc>
+                            <simulationClass>workshop.RecordedSimulation</simulationClass>
                         </configuration>
                     </execution>
                 </executions>

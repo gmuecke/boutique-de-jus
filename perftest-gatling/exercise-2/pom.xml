@@ -23,7 +23,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <sc>workshop.workshop.AnonymousVisitSimulation</sc>
+                            <simulationClass>workshop.workshop.AnonymousVisitSimulation</simulationClass>
                         </configuration>
                     </execution>
                     <execution>
@@ -32,7 +32,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <sc>workshop.RegisterUserSimulation</sc>
+                            <simulationClass>workshop.RegisterUserSimulation</simulationClass>
                         </configuration>
                     </execution>
                     <execution>
@@ -41,7 +41,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <sc>workshop.OrderSimulation</sc>
+                            <simulationClass>workshop.OrderSimulation</simulationClass>
                         </configuration>
                     </execution>
                 </executions>
