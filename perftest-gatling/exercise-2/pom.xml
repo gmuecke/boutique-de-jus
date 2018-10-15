@@ -23,7 +23,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <simulationClass>workshop.workshop.AnonymousVisitSimulation</simulationClass>
+                            <simulationClass>workshop.AnonymousVisitSimulation</simulationClass>
                         </configuration>
                     </execution>
                     <execution>

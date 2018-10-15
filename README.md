@@ -11,11 +11,17 @@ badly run place (i.e. a shop, a bar, an office), where nothing really works and 
 
 # Setup
 
-Build the workshop
+## Requirements
+
+- IntelliJ with the Scala support installed (be sure to have the latest version, especially when running on JDK 11)
+- OR: JDK8 or JDK11, Scala 2.12.8, Maven 3.5.4 (best to have these in addition to IntelliJ)
+- a JVM Monitoring solution (such as VisualVM 1.4.2)
+
+## Build the workshop
 
     mvn clean install
     
-Start the server via bootstrap
+## Start the server via bootstrap
 
     mvn exec:exec -pl bdj-bootstrap
 
