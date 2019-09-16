@@ -24,9 +24,9 @@
             Define the version for gatling and the gatling maven plugin centrally here for all exercises.
             To use a different plugin version, simply set a different property in the child module.
         -->
-        <gatling.version>3.0.0-RC3</gatling.version>
-        <gatling-plugin.version>3.0.0</gatling-plugin.version>
-        <scala.version>2.12.6</scala.version>
+        <gatling.version>3.0.3</gatling.version>
+        <gatling-plugin.version>3.0.3</gatling-plugin.version>
+        <scala.version>2.13.0</scala.version>
     </properties>
 
     <dependencies>
@@ -56,7 +56,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>4.2.0</version>
                 <executions>
                     <execution>
                         <goals>
