@@ -64,10 +64,10 @@
             <tabs>
                 <Tab fx:id="dbServerTab" text="Console">
                     <content>
-                        <ScrollPane fx:id="scrollPane" prefHeight="${scrollPane.parent.height}" prefWidth="${scrollPane.parent.width}">
+                        <ScrollPane fx:id="scrollPane" prefHeight="${scrollPane.parent.height}" prefWidth="${scrollPane.parent.width}"
+                                    hbarPolicy="ALWAYS" vbarPolicy="ALWAYS">
                             <content>
-                                <TextFlow fx:id="consoleArea" prefHeight="${consoleArea.parent.height}"
-                                          prefWidth="${consoleArea.parent.width}" styleClass="console"/>
+                                <TextFlow fx:id="consoleArea" prefHeight="${consoleArea.parent.height}" prefWidth="${consoleArea.parent.width}" styleClass="console"/>
                             </content>
                         </ScrollPane>
                     </content>

@@ -36,7 +36,8 @@
              <Spinner fx:id="threads" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
          </children>
       </GridPane>
-       <ScrollPane fx:id="scrollPane" prefHeight="${scrollPane.parent.height}" prefWidth="${scrollPane.parent.width}">
+       <ScrollPane fx:id="scrollPane" prefHeight="${scrollPane.parent.height}" prefWidth="${scrollPane.parent.width}"
+                   hbarPolicy="ALWAYS" vbarPolicy="ALWAYS">
            <content>
                <TextFlow styleClass="console" fx:id="consoleArea"  prefHeight="${consoleArea.parent.height}" prefWidth="${consoleArea.parent.width}"/>
            </content>
