@@ -10,6 +10,10 @@
     </parent>
     <artifactId>bdj-bootstrap</artifactId>
 
+    <properties>
+        <bdj.finalName>bdj-launcher</bdj.finalName>
+    </properties>
+
     <dependencies>
         <!-- shop modules -->
         <dependency>
@@ -52,7 +56,7 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>8.40.12</version>
+            <version>11.0.0</version>
         </dependency>
     </dependencies>
 
@@ -75,9 +79,8 @@
                     <workingDirectory>${project.basedir}</workingDirectory>
                     <executable>java</executable>
                     <arguments>
-                        <argument>-cp</argument>
-                        <classpath/>
-                        <argument>io.bdj.BoutiqueDeJusApplication</argument>
+                        <argument>-jar</argument>
+                        <argument> ${project.build.directory}/${bdj.finalName}.jar</argument>
                     </arguments>
                     <classpathScope>runtime</classpathScope>
                 </configuration>
@@ -132,7 +135,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>bdj-launcher</finalName>
+                            <finalName>${bdj.finalName}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>src/assembly/jar.xml</descriptor>
