@@ -20,7 +20,7 @@
         <profile>
             <id>gatling</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <skip.gatlingTests>false</skip.gatlingTests>
