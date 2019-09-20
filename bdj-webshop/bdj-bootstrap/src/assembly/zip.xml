@@ -8,7 +8,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/../../</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory/>
             <includes>
                 <include>README*</include>
                 <include>LICENSE*</include>
@@ -16,22 +16,22 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/</directory>
-            <outputDirectory>/</outputDirectory>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory/>
             <includes>
                 <include>bdj-launcher.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/wars</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory/>
             <includes>
                 <include>*.war</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/scripts</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory/>
             <includes>
                 <include>*.*</include>
             </includes>
