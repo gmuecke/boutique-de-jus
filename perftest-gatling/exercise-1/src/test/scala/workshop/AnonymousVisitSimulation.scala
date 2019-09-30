@@ -4,11 +4,16 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
 /**
-  * This ia an example recording (after cleaning out some uneeded requests). Its not covering all the flows of
-  * the web shop yet, so keep on recording :)
-  */
+ * This ia an example recording (after cleaning out some unneeded requests). Its not covering all the flows of
+ * the web shop yet, so keep on recording :)
+ */
 class AnonymousVisitSimulation extends Simulation {
 
+  /*
+  Common HTTP Configuration
+  (Setting the base url we are calling and the common http headers)
+   */
+  // Common HTTP Configuration
   val httpProtocol = http
     .baseUrl("http://localhost:8080")
     .inferHtmlResources()
@@ -53,6 +58,10 @@ class AnonymousVisitSimulation extends Simulation {
         .get("/style/bdj.css")
         .headers(headers_3))
 
+  /*
+  Scenario Definition
+  (Actual user journey that the script will follow on)
+   */
   val scn = scenario("RecordedSimulation")
     .exec(page1)
     .pause(10)
@@ -72,6 +81,10 @@ class AnonymousVisitSimulation extends Simulation {
       .headers(headers_1))
     .pause(4)
 
+  /*
+  Load Scenario
+  (The number of virtual user, their ramp up time, how long the test will run for, etc.)
+   */
   setUp(
     scn.inject(
       atOnceUsers(1)
