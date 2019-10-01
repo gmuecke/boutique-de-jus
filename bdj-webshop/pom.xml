@@ -13,13 +13,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>bdj-db-server</module>
-        <module>bdj-web-server</module>
-        <module>bdj-shop-web</module>
-        <module>bdj-utils</module>
-        <module>bdj-bootstrap</module>
-        <module>bdj-services</module>
-        <module>bdj-model</module>
-        <module>bdj-config</module>
+        <module>bdj-webshop-war</module>
+        <module>bdj-webshop-server</module>
+        <module>bdj-distr</module>
     </modules>
 </project>
