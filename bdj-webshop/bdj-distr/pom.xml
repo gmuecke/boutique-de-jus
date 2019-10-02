@@ -76,19 +76,30 @@
                                     <destFileName>bdj-webshop.war</destFileName>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}/wars</outputDirectory>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
                             <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-jars</id>
+                        <id>copy-jar</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <includeScope>compile</includeScope>
-                            <outputDirectory>target/lib</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>io.bdj</groupId>
+                                    <artifactId>bdj-webshop-server</artifactId>
+                                    <version>1.0-SNAPSHOT</version>
+                                    <classifier>shaded</classifier>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <destFileName>bdj-server.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
                 </executions>
@@ -97,25 +108,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
-                    <execution>
-                        <id>bundle-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>${bdj.finalName}</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>src/assembly/jar.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <manifest>
-                                    <mainClass>io.bdj.Launcher</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>bundle-zip</id>
                         <phase>package</phase>

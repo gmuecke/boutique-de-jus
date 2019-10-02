@@ -19,13 +19,7 @@
             <directory>${project.build.directory}</directory>
             <outputDirectory/>
             <includes>
-                <include>bdj-launcher.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/wars</directory>
-            <outputDirectory/>
-            <includes>
+                <include>*.jar</include>
                 <include>*.war</include>
             </includes>
         </fileSet>

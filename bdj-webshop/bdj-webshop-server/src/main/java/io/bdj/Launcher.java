@@ -16,8 +16,8 @@ public class Launcher {
 
   public static void main(String... args) throws Exception {
 
-    DerbyStandalone dbServer = new DerbyStandalone();
     WebServer webServer = new WebServer().withWarfile(locateWarFile());
+    DerbyStandalone dbServer = new DerbyStandalone();
 
     dbServer.start();
     webServer.start();
@@ -30,7 +30,7 @@ public class Launcher {
   private static Path locateWarFile() throws IOException {
 
     return Optional.ofNullable(System.getProperty("jetty.deploy.war"))
-                   .map(s -> Paths.get(s))
+                   .map(Paths::get)
                    .orElseGet(() -> {
       try {
         return Files.find(Paths.get("."), 4, (p, attr) -> Files.isReadable(p) && p.toString().endsWith(".war"))
