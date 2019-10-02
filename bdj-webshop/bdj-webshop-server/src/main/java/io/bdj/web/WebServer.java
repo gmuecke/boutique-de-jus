@@ -1,6 +1,6 @@
 package io.bdj.web;
 
-import static java.util.logging.Logger.getLogger;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import java.util.Objects;
 
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
@@ -24,16 +24,19 @@ import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.Configuration.ClassList;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlConfiguration;
+import org.slf4j.Logger;
 
 /**
  *
  */
 public class WebServer {
 
-  private static final Logger LOG = getLogger(WebServer.class.getName());
+  private static final Logger LOG = getLogger(WebServer.class);
   private Server server;
+  private Path warfile;
 
   private static Server createServer() throws Exception {
 
@@ -41,7 +44,7 @@ public class WebServer {
     final Server server;
     if (configFile != null) {
       final URI configFileUri = Paths.get(configFile).toUri();
-      LOG.info("Initializing server using config file" + configFile);
+      LOG.info("Initializing server using config file {}", configFile);
 
       final Map<String, String> props = new HashMap<>();
       props.put("jetty.home", new File(System.getProperty("user.dir")).getCanonicalPath());
@@ -50,12 +53,10 @@ public class WebServer {
 
     } else {
       LOG.info("Initializing server using command line args");
-      final QueuedThreadPool threadPool = createThreadPool();
-      server = new Server(threadPool);
+      server = new Server(createThreadPool());
       attachServerConnector(server);
 
-      org.eclipse.jetty.webapp.Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(
-          server);
+      ClassList classlist = ClassList.setServerDefault(server);
       classlist.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration",
                          "org.eclipse.jetty.plus.webapp.EnvConfiguration",
                          "org.eclipse.jetty.plus.webapp.PlusConfiguration");
@@ -186,7 +187,15 @@ public class WebServer {
     return initializers;
   }
 
+  public WebServer withWarfile(final Path warfile) {
+
+    this.warfile = warfile;
+    return this;
+  }
+
   public void start() throws Exception {
+
+    Objects.requireNonNull(warfile, "War file is not specificed");
 
     this.server = createServer();
 
@@ -194,13 +203,7 @@ public class WebServer {
     server.addBean(new EnvEntry("databaseUrl", "jdbc:derby://localhost:1527/testdb"));
     server.addBean(new EnvEntry("databaseDriver", "org.apache.derby.jdbc.ClientDriver"));
 
-    String deployWar = System.getProperty("jetty.deploy.war");
-    if (deployWar == null) {
-      throw new RuntimeException("No war file specified");
-    }
-    final Path warFilePath = Paths.get(deployWar);
-    final WebAppContext webapp = createWebApp(warFilePath);
-    server.setHandler(webapp);
+    server.setHandler(createWebApp(warfile));
     server.start();
   }
 

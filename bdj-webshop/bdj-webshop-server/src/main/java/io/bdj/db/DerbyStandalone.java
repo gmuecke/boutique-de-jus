@@ -1,6 +1,6 @@
 package io.bdj.db;
 
-import static java.util.logging.Logger.getLogger;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -8,16 +8,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Logger;
 
 import org.apache.derby.drda.NetworkServerControl;
+import org.slf4j.Logger;
 
 /**
  *
  */
 public class DerbyStandalone {
 
-    private static final Logger LOG = getLogger(DerbyStandalone.class.getName());
+    private static final Logger LOG = getLogger(DerbyStandalone.class);
     private NetworkServerControl server;
 
     public void start() throws Exception {
@@ -38,7 +38,7 @@ public class DerbyStandalone {
                 server.ping();
                 break;
             } catch (Exception e) {
-                LOG.warning("Server is not started yet ..., retrying after " + i + "s" );
+                LOG.warn("Server is not started yet ..., retrying after {}s", i * 1000);
             }
             Thread.sleep(1000 * i);
         }

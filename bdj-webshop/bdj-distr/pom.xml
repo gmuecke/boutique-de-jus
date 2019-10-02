@@ -69,11 +69,11 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>io.bdj</groupId>
-                                    <artifactId>bdj-shop-web</artifactId>
+                                    <artifactId>bdj-webshop-war</artifactId>
                                     <version>1.0-SNAPSHOT</version>
                                     <type>war</type>
                                     <overWrite>false</overWrite>
-                                    <destFileName>bdj-shop-web.war</destFileName>
+                                    <destFileName>bdj-webshop.war</destFileName>
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/wars</outputDirectory>
