@@ -18,7 +18,7 @@ Record a first very simple flow for load testing.
 
 Install (Setup)
 ---------------
-- Install Java JDK 8
+- Install Java JDK 11
 - Install Scala SDK
 - Install IntelliJ Community Edition
 - Install IntelliJ Scala Plugin (Preferences/Plugins/Install JetBrains plugin<... -> search for 'Scala')
