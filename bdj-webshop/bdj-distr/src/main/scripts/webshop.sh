@@ -1,2 +1,2 @@
-@echo off
+#!/usr/bin/env bash
 java -jar bdj-server.jar

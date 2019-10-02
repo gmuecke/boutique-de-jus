@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <bdj.finalName>bdj-standalone</bdj.finalName>
+        <bdj.finalName>bdj-server</bdj.finalName>
     </properties>
 
     <dependencies>
@@ -44,7 +44,6 @@
                 </executions>
                 <configuration>
                     <executable>java</executable>
-                    <!-- optional -->
                     <workingDirectory>${project.basedir}</workingDirectory>
                     <executable>java</executable>
                     <arguments>
@@ -115,6 +114,9 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <attach>true</attach>
+                            <finalName>bdj-server</finalName>
                             <descriptors>
                                 <descriptor>src/assembly/zip.xml</descriptor>
                             </descriptors>
