@@ -3,7 +3,6 @@ package io.bdj.web;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import io.bdj.Config;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
@@ -35,12 +35,17 @@ import org.slf4j.Logger;
 public class WebServer {
 
   private static final Logger LOG = getLogger(WebServer.class);
+  private final Config config;
   private Server server;
   private Path warfile;
 
-  private static Server createServer() throws Exception {
+  public WebServer(final Config config) {
+    this.config = config;
+  }
 
-    final String configFile = System.getProperty("jetty.configFile");
+  private Server createServer() throws Exception {
+
+    final String configFile = config.getJettyConfigFile();
     final Server server;
     if (configFile != null) {
       final URI configFileUri = Paths.get(configFile).toUri();
@@ -79,7 +84,7 @@ public class WebServer {
    *
    * @return a webApplication context that can be deployed on the jetty server.
    */
-  private static WebAppContext createWebApp(final Path webappWar) throws IOException {
+  private static WebAppContext createWebApp(final Path webappWar) {
 
     final WebAppContext webapp = new WebAppContext();
     webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
@@ -104,12 +109,13 @@ public class WebServer {
    * @param configFile
    *     jetty configuration file. The file must configure a server, otherwise the method will fail
    * @param props
+   *  override properties
    *
    * @return the configured server instace
    *
    * @throws Exception
    */
-  public static Server loadServerFromConfigFile(URI configFile, Map<String, String> props) throws Exception {
+  private static Server loadServerFromConfigFile(URI configFile, Map<String, String> props) throws Exception {
 
     XmlConfiguration configuration = new XmlConfiguration(configFile.toURL());
     configuration.getProperties().putAll(props);
@@ -122,11 +128,11 @@ public class WebServer {
    *
    * @return a new thread pool
    */
-  private static QueuedThreadPool createThreadPool() {
+  private QueuedThreadPool createThreadPool() {
 
     final QueuedThreadPool threadPool = new QueuedThreadPool();
-    threadPool.setMinThreads(Integer.getInteger("jetty.threads.min", 10));
-    threadPool.setMaxThreads(Integer.getInteger("jetty.threads.max", 80));
+    threadPool.setMinThreads(config.getHttpMinThreads());
+    threadPool.setMaxThreads(config.getHttpMaxThreads());
     return threadPool;
   }
 
@@ -137,21 +143,13 @@ public class WebServer {
    * @param server
    *     the Jetty server
    *
-   * @return the created conector
    */
-  private static ServerConnector attachServerConnector(final Server server) {
+  private void attachServerConnector(final Server server) {
 
-    int initialHttpPort = Integer.getInteger("jetty.http.port", 8080);
-
-    //TODO config set accept queue size
-    //TODO config acceptor num
-    //TODO config selector num
-    //TODO config idle timeout
     final ServerConnector connector = new ServerConnector(server);
-    connector.setPort(initialHttpPort);
+    connector.setPort(config.getHttpPort());
+    connector.setAcceptQueueSize(config.getHttpAcceptorQueueSize());
     server.addConnector(connector);
-
-    return connector;
   }
 
   /**
@@ -187,6 +185,12 @@ public class WebServer {
     return initializers;
   }
 
+  /**
+   * Sets the war file that should be deployed on the web container.
+   * @param warfile
+   *  Path to warfile that will be deployed
+   * @return
+   */
   public WebServer withWarfile(final Path warfile) {
 
     this.warfile = warfile;
@@ -198,11 +202,8 @@ public class WebServer {
     Objects.requireNonNull(warfile, "War file is not specificed");
 
     this.server = createServer();
-
-    //TODO make the database url configurable
-    server.addBean(new EnvEntry("databaseUrl", "jdbc:derby://localhost:1527/testdb"));
-    server.addBean(new EnvEntry("databaseDriver", "org.apache.derby.jdbc.ClientDriver"));
-
+    server.addBean(new EnvEntry("databaseUrl", config.getDatabaseUrl()));
+    server.addBean(new EnvEntry("databaseDriver", config.getDatabaseDriver()));
     server.setHandler(createWebApp(warfile));
     server.start();
   }

@@ -16,10 +16,19 @@ public class Launcher {
 
   public static void main(String... args) throws Exception {
 
-    WebServer webServer = new WebServer().withWarfile(locateWarFile());
-    DerbyStandalone dbServer = new DerbyStandalone();
+    final Config config;
+    if(args.length > 0){
+      config = Config.fromJsonFile(Paths.get(args[0]));
+    } else {
+      config = Config.defaultConfig();
+    }
 
-    dbServer.start();
+    WebServer webServer = new WebServer(config).withWarfile(locateWarFile(config));
+
+    if(config.useEmbeddedDatabase()){
+      DerbyStandalone dbServer = new DerbyStandalone(config);
+      dbServer.start();
+    }
     webServer.start();
 
     while (true) {
@@ -27,9 +36,9 @@ public class Launcher {
     }
   }
 
-  private static Path locateWarFile() throws IOException {
+  private static Path locateWarFile(final Config config) {
 
-    return Optional.ofNullable(System.getProperty("jetty.deploy.war"))
+    return Optional.ofNullable(config.getDeploymentWar())
                    .map(Paths::get)
                    .orElseGet(() -> {
       try {
