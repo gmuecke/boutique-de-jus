@@ -18,8 +18,8 @@
       "driver": "org.apache.derby.jdbc.ClientDriver"
     },
     "derby" : {
-      "timeslice": 10,
-      "threads": 5
+      "timeslice": 5,
+      "threads": 10
     }
   }
 }

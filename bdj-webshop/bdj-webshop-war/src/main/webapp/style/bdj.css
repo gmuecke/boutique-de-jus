@@ -1,5 +1,4 @@
 body {
-    background-color: lightyellow;
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
     margin: 0;
 }
@@ -26,7 +25,6 @@ body {
 }
 #loginInfo {
     display: block;
-    color: white;
     text-align: left;
     vertical-align: middle;
     padding: 15px;
@@ -44,7 +42,6 @@ nav.top ul{
     padding: 0 20px;
     margin: 0;
     overflow: hidden;
-    background-color: #333;
     list-style-type: none;
 }
 nav.top li{
@@ -55,17 +52,12 @@ nav.top li{
 
 nav.top a {
     display: block;
-    color: white;
     text-align: center;
     vertical-align: middle;
     padding: 15px;
     text-decoration: none;
 }
-/* Change the link color to #111 (black) on hover */
 
-nav.top ul a:hover {
-    background-color: #888;
-}
 /*
  navigation menu
  */
@@ -77,7 +69,6 @@ nav.side {
     left: 0;
     width: 150px;
     height: 100%;
-    background: yellowgreen;
     z-index: 255;
 }
 nav.side ul {
@@ -91,13 +82,12 @@ nav.side ul a {
 }
 nav.side li {
     border-radius: 25px;
-    border: 1px solid darkolivegreen;
+    border: 1px solid;
     padding: 5px;
     margin: 5px;
     color: black;
 }
 nav.side li:hover {
-    background-color: lightyellow;
 }
 
 /* The main area */
@@ -107,7 +97,6 @@ header {
     width: 100%;
     vertical-align: middle;
     text-align: center;
-    background: yellowgreen;
     color: black;
 }
 main {
@@ -137,7 +126,6 @@ footer {
     bottom: 0px;
     position: fixed;
     width: 100%;
-    background: yellowgreen;
     margin-left: 150px;
     color: black;
 }
