@@ -36,8 +36,6 @@ public class DerbyStandalone {
     System.setProperty("derby.user.admin", "admin");
 
     this.server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-    server.setTimeSlice(config.getDerbyTimeSlice());
-    server.setMaxThreads(config.getDerbyThreads());
     server.start(new PrintWriter(new LogWriter()));
 
     LOG.info("Waiting for server to be started");
@@ -52,6 +50,8 @@ public class DerbyStandalone {
       }
       Thread.sleep(1000 * i);
     }
+    server.setTimeSlice(config.getDerbyTimeSlice());
+    server.setMaxThreads(config.getDerbyThreads());
 
     initDB();
   }
@@ -84,7 +84,9 @@ public class DerbyStandalone {
     @Override
     public void write(final char[] cbuf, final int off, final int len) throws IOException {
 
-      LOG.info(new String(cbuf, off, len));
+      if(len > 0){
+        LOG.info(new String(cbuf, off, len).trim());
+      }
     }
 
     @Override

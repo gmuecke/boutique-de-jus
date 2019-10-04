@@ -7,155 +7,141 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  *
  */
 public final class Config {
 
-  private static final Boolean USE_EMBEDDED_DB = Boolean.valueOf(System.getProperty("db.embdedded", "true"));
-  private static final String DB_JDBC_URL = System.getProperty("db.jdbc.url", "jdbc:derby://localhost:1527/testdb");
-  private static final String DB_JDBC_DRIVER = System.getProperty("db.jdbc.driver", "org.apache.derby.jdbc.ClientDriver");
-  private static final Integer DERBY_THREADS = Integer.getInteger("db.derby.threads", 10);
-  private static final Integer DERBY_TIMESLICE = Integer.getInteger("db.derby.timeslice", 5);
-  private static final String DEPLOY_WAR = System.getProperty("http.jetty.warFile");
-  private static final String JETTY_CONFIG_FILE = System.getProperty("http.jetty.configFile");
-  private static final Integer HTTP_PORT = Integer.getInteger("http.port", 8080);
-  private static final Integer HTTP_ACCEPTOR_QUEUE_SIZE = Integer.getInteger("http.jetty.acceptQueue.size", 0);
-  private static final Integer HTTP_THREADS_MIN = Integer.getInteger("http.jetty.threads.min", 8);
-  private static final Integer HTTP_THREADS_MAX = Integer.getInteger("http.jetty.threads.max", 32);
   private final JsonObject config;
 
-  private Config(final JsonObject config){
+  private Config(final JsonObject config) {
+
     this.config = config;
   }
 
-  public static Config defaultConfig(){
+  public static Config defaultConfig() {
+
     return new Config(Json.createObjectBuilder().build());
   }
 
-  public static Config fromJsonFile(Path jsonConfig){
+  public static Config fromJsonFile(Path jsonConfig) {
 
-    try(BufferedReader reader = Files.newBufferedReader(jsonConfig);
-        JsonReader jsonReader = Json.createReader(reader)){
-        JsonObject config = jsonReader.readObject();
-        return new Config(config);
+    try (BufferedReader reader = Files.newBufferedReader(jsonConfig);
+         JsonReader jsonReader = Json.createReader(reader)) {
+      JsonObject config = jsonReader.readObject();
+      return new Config(config);
 
     } catch (IOException e) {
       throw new RuntimeException("Could not read file " + jsonConfig, e);
     }
   }
 
+  public boolean useEmbeddedDatabase() {
 
-  public boolean useEmbeddedDatabase(){
-    JsonObject db = config.getJsonObject("db");
-    if(db != null){
-      return db.getBoolean("embedded", USE_EMBEDDED_DB);
-    }
-    return USE_EMBEDDED_DB;
+    return db().filter(p -> p.containsKey("embedded"))
+               .map(d -> d.getBoolean("embedded"))
+               .orElseGet(() -> Boolean.valueOf(System.getProperty("db.embdedded", "true")));
   }
 
   public String getDatabaseUrl() {
 
-    JsonObject db = config.getJsonObject("db");
-    if(db != null){
-      JsonObject jdbc = config.getJsonObject("jdbc");
-      return jdbc.getString("url", DB_JDBC_URL);
-    }
-    return DB_JDBC_URL;
+    return jdbc().filter(p -> p.containsKey("url"))
+                 .map(j -> j.getString("url", null))
+                 .orElseGet(() -> System.getProperty("db.jdbc.url", "jdbc:derby://localhost:1527/testdb"));
   }
 
   public String getDatabaseDriver() {
 
-    JsonObject db = config.getJsonObject("db");
-    if(db != null){
-      JsonObject jdbc = config.getJsonObject("jdbc");
-      return jdbc.getString("driver", DB_JDBC_DRIVER);
-    }
-    return DB_JDBC_DRIVER;
+    return db().filter(p -> p.containsKey("driver"))
+               .map(d -> d.getString("driver", null))
+               .orElseGet(() -> System.getProperty("db.jdbc.driver", "org.apache.derby.jdbc.ClientDriver"));
   }
 
   public String getDeploymentWar() {
-    JsonObject http = config.getJsonObject("http");
-    if(http != null){
-      JsonObject jetty = http.getJsonObject("jetty");
-      if(jetty != null){
-        return jetty.getString("warFile", DEPLOY_WAR);
-      }
-    }
-    return DEPLOY_WAR;
+
+    return jetty().filter(p -> p.containsKey("warFile"))
+                  .map(j -> j.getString("warFile", null))
+                  .orElseGet(() -> System.getProperty("http.jetty.warFile"));
   }
 
   public int getHttpPort() {
-    JsonObject http = config.getJsonObject("http");
-    if(http != null){
-      return http.getInt("port", HTTP_PORT);
-    }
-    return HTTP_PORT;
+
+    return http().filter(p -> p.containsKey("port"))
+                 .map(h -> h.getInt("port"))
+                 .orElseGet(() -> Integer.getInteger("http.port", 8080));
   }
 
   public int getHttpAcceptorQueueSize() {
-    JsonObject http = config.getJsonObject("http");
-    if(http != null){
-      JsonObject jetty = http.getJsonObject("jetty");
-      if(jetty != null){
-        return jetty.getInt("acceptQueueSize", HTTP_ACCEPTOR_QUEUE_SIZE);
-      }
-    }
-    return HTTP_ACCEPTOR_QUEUE_SIZE;
+
+    return jetty().filter(p -> p.containsKey("acceptQueueSize"))
+                  .map(j -> j.getInt("acceptQueueSize"))
+                  .orElseGet(() -> Integer.getInteger("http.jetty.acceptQueue" + ".size", 0));
   }
 
   public int getHttpMinThreads() {
-    JsonObject http = config.getJsonObject("http");
-    if(http != null){
-      JsonObject jetty = http.getJsonObject("jetty");
-      if(jetty != null){
-        JsonObject threads = jetty.getJsonObject("threads");
-        return threads.getInt("min", HTTP_THREADS_MIN);
-      }
-    }
-    return HTTP_THREADS_MIN;
+
+    return jetty_threads().filter(p -> p.containsKey("min"))
+                          .map(t -> t.getInt("min"))
+                          .orElseGet(() -> Integer.getInteger("http.jetty.threads.min", 8));
   }
 
   public int getHttpMaxThreads() {
-    JsonObject http = config.getJsonObject("http");
-    if(http != null){
-      JsonObject jetty = http.getJsonObject("jetty");
-      if(jetty != null){
-        JsonObject threads = jetty.getJsonObject("threads");
-        return threads.getInt("max", HTTP_THREADS_MAX);
-      }
-    }
 
-    return HTTP_THREADS_MAX;
+    return jetty_threads().filter(p -> p.containsKey("max"))
+                          .map(t -> t.getInt("max"))
+                          .orElseGet(() -> Integer.getInteger("http.jetty.threads.max", 32));
   }
 
   public String getJettyConfigFile() {
-    JsonObject http = config.getJsonObject("http");
-    if(http != null){
-      JsonObject jetty = http.getJsonObject("jetty");
-      if(jetty != null){
-        return jetty.getString("configFile", JETTY_CONFIG_FILE);
-      }
-    }
-    return JETTY_CONFIG_FILE;
+
+    return jetty().filter(p -> p.containsKey("configFile"))
+                  .map(j -> j.getString("configFile", null))
+                  .orElseGet(() -> System.getProperty("http.jetty.configFile"));
   }
 
   public int getDerbyTimeSlice() {
-    JsonObject db = config.getJsonObject("db");
-    if(db != null){
-      JsonObject derby = config.getJsonObject("derby");
-      return derby.getInt("timeslice", DERBY_TIMESLICE);
-    }
-    return DERBY_TIMESLICE;
+
+    return derby().filter(p -> p.containsKey("timeslice"))
+                  .map(d -> d.getInt("timeslice"))
+                  .orElseGet(() -> Integer.getInteger("db.derby.timeslice", 5));
   }
 
   public int getDerbyThreads() {
-    JsonObject db = config.getJsonObject("db");
-    if(db != null){
-      JsonObject derby = config.getJsonObject("derby");
-      return derby.getInt("threads", DERBY_THREADS);
-    }
-    return DERBY_THREADS;
+
+    return derby().filter(p -> p.containsKey("threads"))
+                  .map(d -> d.getInt("threads"))
+                  .orElseGet(() -> Integer.getInteger("db.derby.threads", 10));
+  }
+
+  private Optional<JsonObject> http() {
+
+    return Optional.ofNullable(config.getJsonObject("http"));
+  }
+
+  private Optional<JsonObject> db() {
+
+    return Optional.ofNullable(config.getJsonObject("db"));
+  }
+
+  private Optional<JsonObject> jdbc() {
+
+    return db().filter(p -> p.containsKey("jdbc")).map(db -> db.getJsonObject("jdbc"));
+  }
+
+  private Optional<JsonObject> jetty() {
+
+    return http().filter(p -> p.containsKey("jetty")).map(http -> http.getJsonObject("jetty"));
+  }
+
+  private Optional<JsonObject> jetty_threads() {
+
+    return jetty().filter(p -> p.containsKey("threads")).map(jetty -> jetty.getJsonObject("threads"));
+  }
+
+  private Optional<JsonObject> derby() {
+
+    return db().filter(p -> p.containsKey("derby")).map(db -> db.getJsonObject("derby"));
   }
 }
