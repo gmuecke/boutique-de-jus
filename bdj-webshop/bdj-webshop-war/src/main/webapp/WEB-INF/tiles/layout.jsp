@@ -9,13 +9,23 @@
         <link rel="stylesheet" href="/style/bdj.css">
         <link rel="stylesheet" href="/style/compat.css">
         <link rel="stylesheet" href="/style/colors.css">
+        <script type="text/javascript" src="scripts/jquery-3.4.1.min.js"></script>
+        <script>
+            function fixNavToTop(){
+                if ((window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0) > 149) {
+                    $("#sidemenu").addClass("fixed-sidenav");
+                } else {
+                    $("#sidemenu").removeClass("fixed-sidenav");
+                }
+            }
+        </script>
     </head>
-    <body>
+    <body onscroll="fixNavToTop()">
         <div class="flex-container">
             <nav class="top ternary-inv">
                 <tiles:insertAttribute name="topmenu"/>
             </nav>
-            <nav class="side ternary">
+            <nav class="side secondary" id="sidemenu">
                 <tiles:insertAttribute name="menu"/>
             </nav>
             <header class="secondary">

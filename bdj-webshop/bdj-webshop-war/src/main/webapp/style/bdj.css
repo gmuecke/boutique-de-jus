@@ -64,28 +64,34 @@ nav.top a {
 
 
 nav.side {
-    position: fixed;
-    top:50px;
+    position: absolute;
+    top:200px;
     left: 0;
-    width: 150px;
-    height: 100%;
-    z-index: 255;
+    width: 100%;
+    z-index: 254;
 }
+nav.side.fixed-sidenav {
+    position: fixed !important;
+    top:50px !important;
+}
+
 nav.side ul {
     list-style-type: none;
     padding: 0;
-    margin-top: 150px;
+    margin: 0;
 }
 
 nav.side ul a {
     text-decoration: none;
 }
 nav.side li {
-    border-radius: 25px;
+    /*border-radius: 25px;*/
+    border-radius: 10px 10px 0 0;
     border: 1px solid;
     padding: 5px;
-    margin: 5px;
-    color: black;
+    margin: 5px 5px 0 0;
+    display: inline-block;
+    min-width: 100px;
 }
 nav.side li:hover {
 }
@@ -97,10 +103,8 @@ header {
     width: 100%;
     vertical-align: middle;
     text-align: center;
-    color: black;
 }
 main {
-    margin-left: 150px;
     padding: 20px !important;
     text-align: left;
 }
@@ -126,8 +130,6 @@ footer {
     bottom: 0px;
     position: fixed;
     width: 100%;
-    margin-left: 150px;
-    color: black;
 }
 
 
