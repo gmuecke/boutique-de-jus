@@ -1,0 +1,25 @@
+{
+  "http" : {
+    "port" : 8080,
+    "jetty" : {
+      "warFile": null,
+      "configFile": null,
+      "threads" : {
+        "min" : 8,
+        "max" : 32
+      },
+      "acceptQueueSize" : 0
+    }
+  },
+  "db" : {
+    "embedded": true,
+    "jdbc" : {
+      "url": "jdbc:derby://localhost:1527/testdb",
+      "driver": "org.apache.derby.jdbc.ClientDriver"
+    },
+    "derby" : {
+      "timeslice": 5,
+      "threads": 10
+    }
+  }
+}

@@ -24,3 +24,5 @@ Start IDE
 Start WebShop Launcher
 
     webshop.bat
+    
+Unzip Gatling into a folder & Start the recorder
