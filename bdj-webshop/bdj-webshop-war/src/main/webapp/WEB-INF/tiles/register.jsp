@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 
+<h1>Registration</h1>
 <% if (request.getAttribute("result") != null) {%>
     <span class="error"><%= request.getAttribute("result")%></span>
 <% } %>

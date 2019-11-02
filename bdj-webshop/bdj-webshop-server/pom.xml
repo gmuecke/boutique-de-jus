@@ -57,16 +57,6 @@
             <version>${commons.cli.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.bdj</groupId>
-            <artifactId>bdj-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bdj</groupId>
-            <artifactId>bdj-services</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>${derby.version}</version>

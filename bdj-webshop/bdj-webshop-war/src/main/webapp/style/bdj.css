@@ -69,6 +69,7 @@ nav.side {
     left: 0;
     width: 100%;
     z-index: 254;
+    border-bottom: 2px solid #5B4407;
 }
 nav.side.fixed-sidenav {
     position: fixed !important;
@@ -92,6 +93,7 @@ nav.side li {
     margin: 5px 5px 0 0;
     display: inline-block;
     min-width: 100px;
+    border-bottom: none !important;
 }
 nav.side li:hover {
 }
@@ -107,6 +109,8 @@ header {
 main {
     padding: 20px !important;
     text-align: left;
+    top: 20px;
+    position: relative;
 }
 
 main h1 {
