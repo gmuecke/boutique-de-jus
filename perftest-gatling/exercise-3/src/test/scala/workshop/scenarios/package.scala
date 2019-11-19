@@ -21,14 +21,20 @@ package object scenarios {
 
     def anonymousBrowsing: ChainBuilder = group("Anonymous Browsing") {
         exec(JuicesPage)
+        .pause(20)
         .exec(BooksPage)
+        .pause(20)
         .exec(AccessoiresPage)
+        .pause(20)
         .exec(CoursesPage)
+        .pause(20)
     }
 
     def orderProduct(productId: String, qty: Int = 1, returnPage: ShopPages.Page = ShopPages.Juices): ChainBuilder =
       group("Order") {
-        exec(AddToCart(productId, qty, returnPage)).exec(returnPage.chains)
+        exec(AddToCart(productId, qty, returnPage))
+          .pause(20)
+          .exec(returnPage.chains)
       }
 
     def checkout(products: String*): ChainBuilder = group("Checkout"){
@@ -37,8 +43,11 @@ package object scenarios {
 
     def shopProducts(username: String, password: String)(products: String*): ChainBuilder = group("Shopping") {
       exec(chains.login(username, password))
+        .pause(20)
         .exec(products.map(id => chains.orderProduct(id)).toArray)
+        .pause(20)
         .exec(chains.checkout(products: _*))
+        .pause(20)
         .exec(chains.logout)
     }
   }
@@ -46,15 +55,15 @@ package object scenarios {
   val mostBrowseSomeShop9010: ScenarioBuilder = scenario("Most Browser, Some Shop 80/20")
     .exec(chains.welcome)
     .randomSwitch(
-      0.90 -> chains.anonymousBrowsing,
-      0.10 -> chains.shopProducts("test","test")("1", "4", "16", "16")
+      90.0 -> chains.anonymousBrowsing,
+      10.0 -> chains.shopProducts("test","test")("1", "4", "16", "16")
     )
 
   val mostBrowseSomeShop8020: ScenarioBuilder = scenario("Most Browser, Some Shop 80/20")
     .exec(chains.welcome)
     .randomSwitch(
-      0.80 -> chains.anonymousBrowsing,
-      0.20 -> chains.shopProducts("test","test")("1", "4", "16", "16")
+      80.0 -> chains.anonymousBrowsing,
+      20.0 -> chains.shopProducts("test","test")("1", "4", "16", "16")
     )
 
   val onlyBrowsing: ScenarioBuilder = scenario("Only Browser")
