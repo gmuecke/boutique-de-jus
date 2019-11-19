@@ -105,14 +105,14 @@ public final class Config {
 
     return derby().filter(p -> p.containsKey("timeslice"))
                   .map(d -> d.getInt("timeslice"))
-                  .orElseGet(() -> Integer.getInteger("db.derby.timeslice", 5));
+                  .orElseGet(() -> Integer.getInteger("db.derby.timeslice", -1));
   }
 
   public int getDerbyThreads() {
 
     return derby().filter(p -> p.containsKey("threads"))
                   .map(d -> d.getInt("threads"))
-                  .orElseGet(() -> Integer.getInteger("db.derby.threads", 10));
+                  .orElseGet(() -> Integer.getInteger("db.derby.threads", 0));
   }
 
   private Optional<JsonObject> http() {
