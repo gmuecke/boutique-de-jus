@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="/style/bdj.css">
         <link rel="stylesheet" href="/style/compat.css">
         <link rel="stylesheet" href="/style/colors.css">
-        <script type="text/javascript" src="scripts/jquery-3.4.1.min.js"></script>
+        <script type="text/javascript" src="/scripts/jquery-3.4.1.min.js"></script>
         <script>
             function fixNavToTop(){
                 if ((window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0) > 149) {
