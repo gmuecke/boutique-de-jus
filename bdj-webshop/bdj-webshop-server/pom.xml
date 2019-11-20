@@ -12,7 +12,7 @@
     <artifactId>bdj-webshop-server</artifactId>
 
     <properties>
-        <jetty.version>9.4.2.v20170220</jetty.version>
+        <jetty.version>9.4.23.v20191118</jetty.version>
         <derby.version>10.13.1.1</derby.version>
         <commons.cli.version>1.4</commons.cli.version>
         <log4j2.version>2.7</log4j2.version>
